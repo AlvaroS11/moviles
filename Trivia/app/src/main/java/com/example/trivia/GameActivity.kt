@@ -12,6 +12,8 @@ class GameActivity : AppCompatActivity() {
     private var mCurrentPosition: Int = 1
     private var mQuestionsList: ArrayList<Question>? = null
 
+    public var correct = 0
+
     /*
     private var btnDating = findViewById<Button>(R.id.btn_dating)
     private var btnRelated = findViewById<Button>(R.id.btn_related)
@@ -32,66 +34,17 @@ class GameActivity : AppCompatActivity() {
 
         // buttons behaviour
         btnDating.setOnClickListener{
-            mCurrentPosition++
-            when {
-                mCurrentPosition <= mQuestionsList!!.size -> {
-                    setQuestion()
-                } else ->
-                {
-                    // go to finish screen
-                }
-            }
+            handleRespone(btnRelated, btnBoth, btnDating,0)
         }
 
         btnRelated.setOnClickListener{
-
-            val question = mQuestionsList?.get(mCurrentPosition - 1)
-
-            if(question!!.answer == "Related")
-                btnRelated.setBackgroundColor(Color.parseColor("#00FF00"))
-            else{
-                btnRelated.setBackgroundColor(Color.parseColor("#FF0000"))
-                if(question.answer == "Both")
-                    btnBoth.setBackgroundColor(Color.parseColor("#00FF00"))
-                else
-                    btnDating.setBackgroundColor(Color.parseColor("#00FF00"))
-            }
-
-            //
-
-            Handler(Looper.getMainLooper()).postDelayed({
-                // Your Code
-                mCurrentPosition++
-                when {
-                    mCurrentPosition <= mQuestionsList!!.size -> {
-
-                        setQuestion()
-
-                        btnRelated.setBackgroundColor(Color.parseColor("#0000FF"))
-                        btnDating.setBackgroundColor(Color.parseColor("#0000FF"))
-                        btnBoth.setBackgroundColor(Color.parseColor("#0000FF"))
-                    } else ->
-                {
-                    // go to finish screen
-                }
-                }
-            }, 500)
-
-
+            handleRespone(btnRelated, btnBoth, btnDating,1)
         }
 
         btnBoth.setOnClickListener{
-            mCurrentPosition++
-            when {
-                mCurrentPosition <= mQuestionsList!!.size -> {
-                    setQuestion()
-                } else ->
-            {
-                // go to finish screen
-            }
-            }
+            handleRespone(btnRelated, btnBoth, btnDating,2)
         }
-        
+
     }
 
     private fun setQuestion() {
@@ -107,6 +60,63 @@ class GameActivity : AppCompatActivity() {
         text.text = question.question
         image1.setImageResource(question.firstImage)
         image2.setImageResource(question.secondImage)
+    }
+
+    private fun handleRespone(btnRelated: Button, btnBoth: Button, btnDating: Button, whoPressed: Int){
+        val counter = findViewById<TextView>(R.id.Counter)
+        val question = mQuestionsList?.get(mCurrentPosition - 1)
+
+        if(question!!.answer == "Dating") {
+            btnDating.setBackgroundColor(Color.parseColor("#00FF00"))//verde
+            if (whoPressed==1)
+                btnRelated.setBackgroundColor(Color.parseColor("#FF0000"))
+            else if (whoPressed==2)
+                btnBoth.setBackgroundColor(Color.parseColor("#FF0000"))
+            else {
+                correct++
+            }
+        }
+        else if(question!!.answer == "Related") {
+            btnRelated.setBackgroundColor(Color.parseColor("#00FF00"))//green
+            if (whoPressed==0)
+                btnDating.setBackgroundColor(Color.parseColor("#FF0000"))
+            else if(whoPressed==2)
+                btnBoth.setBackgroundColor(Color.parseColor("#FF0000"))
+            else
+                correct++
+        }
+        else if(question!!.answer == "Both"){
+            btnBoth.setBackgroundColor(Color.parseColor("#00FF00"))//Green
+            if(whoPressed==0)
+                btnDating.setBackgroundColor(Color.parseColor("#FF0000"))
+            else if (whoPressed==1)
+                btnRelated.setBackgroundColor(Color.parseColor("#FF0000"))
+            else
+                correct++
+        }
+        counter.text = correct.toString()
+        //
+
+        Handler(Looper.getMainLooper()).postDelayed({
+            // Your Code
+            mCurrentPosition++
+            when {
+                mCurrentPosition <= mQuestionsList!!.size -> {
+
+                    setQuestion()
+
+                    btnRelated.setBackgroundColor(Color.parseColor("#0000FF"))
+                    btnDating.setBackgroundColor(Color.parseColor("#0000FF"))
+                    btnBoth.setBackgroundColor(Color.parseColor("#0000FF"))
+                } else ->
+            {
+                println("NO QUEDAN PREGUNTAS")
+                // go to finish screen
+            }
+            }
+        }, 500)
+
+
     }
 
     /*
