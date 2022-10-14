@@ -69,16 +69,21 @@ fun MainScreen() {
         }
     }
 }
-//////////////////////////
 
+// ---------- GAME SCREEN -----------
+
+// GameScreen Variables
 
 data class Response(var _datingBtnColor: Int, var _relatedBtnColor: Int, var _bothBtnColor: Int, var _correct: Int)
 
+var mQuestionsList = Constants.getQuestions()
+
+var suffledQuestions = mQuestionsList.shuffled()
 
 @Preview
 @Composable
 fun GameScreen() {
-    var mQuestionsList = Constants.getQuestions()
+
     var primaryColor = MaterialTheme.colors.primary
 
     var mCurrentPosition by rememberSaveable { mutableStateOf(0) }
@@ -86,10 +91,10 @@ fun GameScreen() {
     var correct by rememberSaveable { mutableStateOf(0) }
 
     var datingBtnColor by rememberSaveable { mutableStateOf(primaryColor.toArgb())}
-    var relatedBtnColor by rememberSaveable() { mutableStateOf(primaryColor.toArgb())}
-    var bothBtnColor by rememberSaveable() { mutableStateOf(primaryColor.toArgb())}
+    var relatedBtnColor by rememberSaveable { mutableStateOf(primaryColor.toArgb())}
+    var bothBtnColor by rememberSaveable { mutableStateOf(primaryColor.toArgb())}
 
-    val question = mQuestionsList!![mCurrentPosition]
+    val question = suffledQuestions!![mCurrentPosition]
 
     Column(
         modifier = Modifier
@@ -194,7 +199,7 @@ fun handleResponse(button: String, question: Question, correct: Int): Response{
                 _datingBtnColor = Color.Red.toArgb()
             }
             "Related" -> {
-                _relatedBtnColor = Color.Red.toArgb()
+                _relatedBtnColor = Color.Green.toArgb()
                 _datingBtnColor = Color.Red.toArgb()
 
             }
