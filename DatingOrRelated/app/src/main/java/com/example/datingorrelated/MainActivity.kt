@@ -24,6 +24,8 @@ import androidx.compose.ui.unit.sp
 import androidx.core.graphics.toColor
 import com.example.datingorrelated.Constants
 import com.example.datingorrelated.Question
+import kotlinx.coroutines.delay
+import kotlin.math.min
 import kotlin.random.Random
 
 class MainActivity : ComponentActivity() {
@@ -74,7 +76,6 @@ fun MainScreen() {
 
 data class Response(var _datingBtnColor: Int, var _relatedBtnColor: Int, var _bothBtnColor: Int, var _correct: Int)
 
-
 @Preview
 @Composable
 fun GameScreen() {
@@ -91,6 +92,9 @@ fun GameScreen() {
 
     val question = mQuestionsList!![mCurrentPosition]
 
+    //var min by rememberSaveable { mutableStateOf(0) }
+    var sec by rememberSaveable { mutableStateOf(0) }
+
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -98,6 +102,8 @@ fun GameScreen() {
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
+        timer()
+        //handleTime(min, sec)
         CorrectAnswersText(number = correct)
         QuestionText(question.question)
         Row(
@@ -176,13 +182,13 @@ fun GameScreen() {
 
     }
 }
-
 fun handleResponse(button: String, question: Question, correct: Int): Response{
     var _datingBtnColor = 0
     var _bothBtnColor = 0
     var _relatedBtnColor = 0
     var _correct = correct
 
+    println("printing test")
     when(button){
         "Dating" -> when(question!!.answer){
             "Dating" -> {
@@ -273,3 +279,32 @@ fun QuestionImage(image: Int) {
             .size(150.dp)
     )
 }
+
+@Preview
+@Composable
+fun timer() {
+    var seconds by remember {
+        mutableStateOf(0)
+    }
+    var minutes by remember {
+        mutableStateOf(0)
+    }
+    Text(
+        text = "0 $minutes : $seconds",
+        fontSize = 40.sp,
+        color = MaterialTheme.colors.primary,
+        textAlign = TextAlign.Center
+    )
+
+    LaunchedEffect(key1 = seconds, key2 = minutes){
+        delay(1000)
+        if(seconds % 59 == 0 && seconds != 0){
+            seconds = 0
+            minutes = minutes + 1
+        }
+        else
+            seconds = seconds + 1
+    }
+    println(seconds)
+}
+
