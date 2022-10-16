@@ -1,12 +1,16 @@
 package com.example.datingorrelated
 
+import android.app.Application
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.*
@@ -17,22 +21,49 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.graphics.toColor
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.datingorrelated.Constants
 import com.example.datingorrelated.Question
 import kotlinx.coroutines.delay
 import kotlin.math.min
 import kotlin.random.Random
+import androidx.compose.foundation.lazy.items
+import androidx.compose.ui.platform.LocalContext
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.viewmodel.compose.LocalViewModelStoreOwner
+import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.ui.Alignment.Companion.CenterHorizontally
+
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            MainScreen()
+            //MainScreen()
+
+
+            val owner = LocalViewModelStoreOwner.current
+
+            owner?.let {
+                val viewModel: GameViewModel = viewModel(
+                    it,
+                    "GameViewModel",
+                    GameViewModelFactory(
+                        LocalContext.current.applicationContext
+                                as Application)
+                )
+
+                RankingSetUp(viewModel)
+            }
         }
     }
 }
@@ -82,6 +113,7 @@ var mQuestionsList = Constants.getQuestions()
 var suffledQuestions = mQuestionsList.shuffled()
 
 //endregion
+var testingSeconds = 0
 
 @Preview
 @Composable
@@ -108,7 +140,9 @@ fun GameScreen() {
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        timer()
+        //timer()
+        //print(sec)
+        TopLevel()
         //handleTime(min, sec)
         CorrectAnswersText(number = correct)
         QuestionText(question.question)
@@ -122,7 +156,7 @@ fun GameScreen() {
         // Dating button
         Button(
             onClick = {
-
+                print(testingSeconds)
                 val(_datingBtnColor, _relatedBtnColor, _bothBtnColor, _correct) = handleResponse("Dating", question, correct)
 
                 datingBtnColor = _datingBtnColor
@@ -313,5 +347,244 @@ fun timer() {
             seconds = seconds + 1
     }
     println(seconds)
+}
+
+
+class ViewModelTimer : ViewModel(){
+    var totalMinutos by mutableStateOf(0)
+    var totalSegundos by mutableStateOf(0)
+
+    @Composable
+    fun addingTime() {
+        LaunchedEffect(key1 = totalMinutos, key2 =  totalSegundos){
+            delay(1000)
+            if (totalMinutos % 59 == 0 && totalSegundos != 0) {
+                totalSegundos = 0
+                totalMinutos = totalMinutos + 1
+            } else
+                totalSegundos = totalSegundos + 1
+        }
+    }
+}
+
+@Composable
+fun TopLevel(model: ViewModelTimer = viewModel()){
+    //timerScreen(minutos = model.totalMinutos, segundos = model.totalSegundos){model.addingTime()}
+}
+
+@Composable
+fun timerScreen(minutos: Int, segundos: Int, addCount: () -> Unit = {}){
+    Text(
+        text = "0 $minutos : $segundos",
+        fontSize = 40.sp,
+        color = MaterialTheme.colors.primary,
+        textAlign = TextAlign.Center
+    )
+    addCount
+}
+
+
+/*
+@Preview
+@Composable
+fun timer() {
+    var seconds by remember {
+        mutableStateOf(0)
+    }
+    var minutes by remember {
+        mutableStateOf(0)
+    }
+    Text(
+        text = "0 $minutes : $testingSeconds",
+        fontSize = 40.sp,
+        color = MaterialTheme.colors.primary,
+        textAlign = TextAlign.Center
+    )
+
+    LaunchedEffect(key1 = testingSeconds, key2 = minutes){
+        delay(1000)
+        if(testingSeconds % 59 == 0 && testingSeconds != 0){
+            testingSeconds = 0
+            minutes = minutes + 1
+        }
+        else
+            testingSeconds = testingSeconds + 1
+    }
+    println(testingSeconds)
+}*/
+
+@Composable
+fun RankingSetUp(viewModel: GameViewModel) {
+
+    val allGames by viewModel.allGames.observeAsState(listOf())
+    val searchResults by viewModel.searchResults.observeAsState(listOf())
+
+    Ranking(
+        allGames = allGames ,
+        searchResults = searchResults ,
+        viewModel = viewModel
+    )
+}
+
+@Composable
+fun Ranking(allGames: List<GameStats>, searchResults: List<GameStats>, viewModel: GameViewModel) {
+    var gameName by remember { mutableStateOf("") }
+    var gameSecs by remember { mutableStateOf("") }
+    var searching by remember { mutableStateOf(false) }
+
+    val onProductTextChange = { text: String ->
+        gameName = text
+    }
+
+    val ongameSecsTextChange = { text: String ->
+        gameSecs = text
+    }
+
+
+    Column(
+        horizontalAlignment = CenterHorizontally,
+        modifier = Modifier
+            .fillMaxWidth()
+    ) {
+        CustomTextField(
+            title = "Player Name",
+            textState = gameName,
+            onTextChange = onProductTextChange,
+            keyboardType = KeyboardType.Text
+        )
+
+        /*CustomTextField(
+            title = "Score",
+            textState = gameSecs,
+            onTextChange = ongameSecsTextChange,
+            keyboardType = KeyboardType.Number
+        )
+*/
+        Row(
+            horizontalArrangement = Arrangement.SpaceEvenly,
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(10.dp)
+        ) {
+            Button(onClick = {
+                if (gameSecs.isNotEmpty()) {
+                    viewModel.insertProduct(
+                        GameStats(
+                            gameName,
+                            gameSecs.toInt()
+                        )
+                    )
+                    searching = false
+                }
+            }) {
+                Text("Add")
+            }
+
+            Button(onClick = {
+                searching = true
+                viewModel.findProduct(gameName)
+            }) {
+                Text("Search")
+            }
+
+            Button(onClick = {
+                searching = false
+                viewModel.deleteProduct(gameName)
+            }) {
+                Text("Delete")
+            }
+
+            Button(onClick = {
+                searching = false
+                gameName = ""
+                gameSecs = ""
+            }) {
+                Text("Clear")
+            }
+        }
+
+
+
+        LazyColumn(
+            Modifier
+                .fillMaxWidth()
+                .padding(10.dp)
+        ) {
+            val list = if (searching) searchResults else allGames
+
+            item {
+                TitleRow(head1 = "Id", head2 = "Player Name", head3 = "Score")
+            }
+
+            items(list) { game ->
+                GameRow(
+                    id = game.id, name = game.playerName,
+                    gameSecs = game.timeSecs
+                )
+            }
+        }
+    }
+
+    }
+
+@Composable
+fun TitleRow(head1: String, head2: String, head3: String) {
+    Row(
+        modifier = Modifier
+            .background(MaterialTheme.colors.primary)
+            .fillMaxWidth()
+            .padding(5.dp)
+    ) {
+        Text(head1, color = Color.White,
+            modifier = Modifier
+                .weight(0.1f))
+        Text(head2, color = Color.White,
+            modifier = Modifier
+                .weight(0.2f))
+        Text(head3, color = Color.White,
+            modifier = Modifier.weight(0.2f))
+    }
+}
+
+@Composable
+fun GameRow(id: Int, name: String, gameSecs: Int) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(5.dp)
+    ) {
+        Text(id.toString(), modifier = Modifier
+            .weight(0.1f))
+        Text(name, modifier = Modifier.weight(0.2f))
+        Text(gameSecs.toString(), modifier = Modifier.weight(0.2f))
+    }
+}
+
+@Composable
+fun CustomTextField(
+    title: String,
+    textState: String,
+    onTextChange: (String) -> Unit,
+    keyboardType: KeyboardType
+) {
+    OutlinedTextField(
+        value = textState,
+        onValueChange = { onTextChange(it) },
+        keyboardOptions = KeyboardOptions(
+            keyboardType = keyboardType
+        ),
+        singleLine = true,
+        label = { Text(title)},
+        modifier = Modifier.padding(10.dp),
+        textStyle = TextStyle(fontWeight = FontWeight.Bold,
+            fontSize = 30.sp)
+    )
+}
+
+class GameViewModelFactory(val application: Application) :
+    ViewModelProvider.Factory {
+    override fun <T : ViewModel> create(modelClass: Class<T>): T {
+        return GameViewModel(application) as T
+    }
 }
 
