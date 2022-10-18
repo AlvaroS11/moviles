@@ -42,13 +42,18 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewmodel.compose.LocalViewModelStoreOwner
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment.Companion.CenterHorizontally
+import androidx.navigation.NavController
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
+
 
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            //MainScreen()
+            Navigation()
 
 
             val owner = LocalViewModelStoreOwner.current
@@ -69,9 +74,8 @@ class MainActivity : ComponentActivity() {
 }
 
 
-@Preview
 @Composable
-fun MainScreen() {
+fun MainScreen(navController: NavController) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -88,12 +92,12 @@ fun MainScreen() {
         )
         Button(
             onClick = {
-                //GameScreen()
+                navController.navigate(Screen.GameScreen.route);
             },
             colors = ButtonDefaults.buttonColors(backgroundColor = MaterialTheme.colors.background)
         ) {
             Text(
-                text = "Start button",
+                text = "Start Game!",
                 fontSize = 32.sp,
                 color = MaterialTheme.colors.primary,
                 modifier = Modifier.fillMaxWidth(),
@@ -102,6 +106,8 @@ fun MainScreen() {
         }
     }
 }
+
+
 
 // ---------- GAME SCREEN -----------
 
