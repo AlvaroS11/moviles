@@ -16,7 +16,13 @@ fun Navigation(){
             MainScreen(navController = navController) //Asignamos la función a la ruta
         }
         composable(route = Screen.GameScreen.route){
-            GameScreen()
+            GameScreen(navController = navController)
+        }
+        composable(route = Screen.CreditsScreen.route){
+            Credits(navController = navController)
+        }
+        composable(route = Screen.PauseScreen.route){
+            Pause(navController = navController)
         }
         composable(route = Screen.EndGameScreen.route){
             //EndGameScreen()
