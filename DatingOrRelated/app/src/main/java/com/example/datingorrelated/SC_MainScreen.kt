@@ -56,6 +56,23 @@ fun MainScreen(navController: NavController) {
                 textAlign = TextAlign.Center
             )
         }
+
+
+        Button(
+            onClick = {
+                navController.navigate(Screen.RankingScreen.route);
+            },
+            colors = ButtonDefaults.buttonColors(backgroundColor = MaterialTheme.colors.background)
+        ) {
+            Text(
+                text = "Ranking",
+                fontSize = 32.sp,
+                color = MaterialTheme.colors.primary,
+                modifier = Modifier.fillMaxWidth(),
+                textAlign = TextAlign.Center
+            )
+        }
+
         val activity = (LocalContext.current as? Activity)
 
         Button(
