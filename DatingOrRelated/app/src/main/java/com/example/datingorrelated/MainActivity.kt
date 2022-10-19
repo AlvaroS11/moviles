@@ -42,52 +42,24 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewmodel.compose.LocalViewModelStoreOwner
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment.Companion.CenterHorizontally
+import androidx.navigation.NavController
+//import androidx.navigation.compose.NavHost
+//import androidx.navigation.compose.composable
+//import androidx.navigation.compose.rememberNavController
+
 
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            //MainScreen()
+            Navigation()
 
         }
     }
 }
 
 
-@Preview
-@Composable
-fun MainScreen() {
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .fillMaxHeight(),
-        verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        Text(
-            text = "Dating or related?",
-            fontSize = 32.sp,
-            color = MaterialTheme.colors.primary,
-            modifier = Modifier.fillMaxWidth(),
-            textAlign = TextAlign.Center
-        )
-        Button(
-            onClick = {
-                //GameScreen()
-            },
-            colors = ButtonDefaults.buttonColors(backgroundColor = MaterialTheme.colors.background)
-        ) {
-            Text(
-                text = "Start button",
-                fontSize = 32.sp,
-                color = MaterialTheme.colors.primary,
-                modifier = Modifier.fillMaxWidth(),
-                textAlign = TextAlign.Center
-            )
-        }
-    }
-}
 
 // ---------- GAME SCREEN -----------
 
@@ -101,9 +73,8 @@ var suffledQuestions = mQuestionsList.shuffled()
 //endregion
 var testingSeconds = 0
 
-@Preview
 @Composable
-fun GameScreen() {
+fun GameScreen(navController: NavController) {
     var primaryColor = MaterialTheme.colors.primary
 
     var mCurrentPosition by rememberSaveable { mutableStateOf(0) }
@@ -204,6 +175,23 @@ fun GameScreen() {
             colors = ButtonDefaults.buttonColors(backgroundColor = Color(bothBtnColor))
         ) {
             ButtonText("Both")
+        }
+
+
+        //PAUSE BUTTON
+        Button(
+            onClick = {
+                navController.navigate(Screen.PauseScreen.route);
+            },
+            colors = ButtonDefaults.buttonColors(backgroundColor = MaterialTheme.colors.background)
+        ) {
+            Text(
+                text = "Pause",
+                fontSize = 20.sp,
+                color = MaterialTheme.colors.primary,
+                modifier = Modifier.weight(0.25f),
+                textAlign = TextAlign.Right
+            )
         }
 
     }
