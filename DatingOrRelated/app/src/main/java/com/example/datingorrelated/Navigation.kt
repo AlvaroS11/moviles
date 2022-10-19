@@ -25,7 +25,7 @@ fun Navigation(){
             Pause(navController = navController)
         }
         composable(route = Screen.EndGameScreen.route){
-            //EndGameScreen()
+            EndGameScreen(navController = navController)
         }
         composable(route = Screen.RankingScreen.route){
             //Ranking()

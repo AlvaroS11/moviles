@@ -100,10 +100,11 @@ fun GameScreen(navController: NavController) {
     var bothBtnColor by rememberSaveable { mutableStateOf(primaryColor.toArgb())}
 
     val question = suffledQuestions!![mCurrentPosition]
+    val maximun = mQuestionsList.size
+
 
     //var min by rememberSaveable { mutableStateOf(0) }
     var sec by rememberSaveable { mutableStateOf(0) }
-
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -139,7 +140,11 @@ fun GameScreen(navController: NavController) {
                     datingBtnColor = primaryColor.toArgb()
                     relatedBtnColor = primaryColor.toArgb()
                     bothBtnColor = primaryColor.toArgb()
-                    mCurrentPosition++
+                    if(mCurrentPosition == maximun-1){
+                        navController.navigate(Screen.EndGameScreen.route)
+                    }else{
+                        mCurrentPosition++
+                    }
                 }, 500)
             },
             colors = ButtonDefaults.buttonColors(backgroundColor = Color(datingBtnColor))
@@ -161,7 +166,11 @@ fun GameScreen(navController: NavController) {
                     datingBtnColor = primaryColor.toArgb()
                     relatedBtnColor = primaryColor.toArgb()
                     bothBtnColor = primaryColor.toArgb()
-                    mCurrentPosition++
+                    if(mCurrentPosition == maximun-1){
+                        navController.navigate(Screen.EndGameScreen.route)
+                    }else{
+                        mCurrentPosition++
+                    }
                 }, 500)
             },
             colors = ButtonDefaults.buttonColors(backgroundColor = Color(relatedBtnColor))
@@ -183,7 +192,12 @@ fun GameScreen(navController: NavController) {
                     datingBtnColor = primaryColor.toArgb()
                     relatedBtnColor = primaryColor.toArgb()
                     bothBtnColor = primaryColor.toArgb()
-                    mCurrentPosition++
+
+                    if(mCurrentPosition == maximun-1){
+                        navController.navigate(Screen.EndGameScreen.route)
+                    }else{
+                        mCurrentPosition++
+                    }
                 }, 500)
             },
             colors = ButtonDefaults.buttonColors(backgroundColor = Color(bothBtnColor))
