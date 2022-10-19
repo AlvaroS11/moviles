@@ -11,7 +11,7 @@ import androidx.navigation.compose.rememberNavController
 
 @Composable
 fun Navigation(){
-    val navController = rememberNavController()
+    val navController = rememberNavController();
     NavHost(navController = navController, startDestination = Screen.MainScreen.route){
         composable(route = Screen.MainScreen.route){
             MainScreen(navController = navController) //Asignamos la función a la ruta
@@ -26,12 +26,11 @@ fun Navigation(){
             Pause(navController = navController)
         }
         composable(route = Screen.EndGameScreen.route){
-            //EndGameScreen()
+            EndGameScreen(navController = navController)
         }
         composable(route = Screen.RankingScreen.route){
-            Ranking()
+            //Ranking()
         }
-        //composable(route = Screen.)
     }
 }
 

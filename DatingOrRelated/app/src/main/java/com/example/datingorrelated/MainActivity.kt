@@ -43,9 +43,9 @@ import androidx.lifecycle.viewmodel.compose.LocalViewModelStoreOwner
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment.Companion.CenterHorizontally
 import androidx.navigation.NavController
-//import androidx.navigation.compose.NavHost
-//import androidx.navigation.compose.composable
-//import androidx.navigation.compose.rememberNavController
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
 
 
 
@@ -54,6 +54,18 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             Navigation()
+
+
+            val owner = LocalViewModelStoreOwner.current
+
+            owner?.let {
+                val viewModel: GameViewModel = viewModel(
+                    it,
+                    "GameViewModel",
+                    GameViewModelFactory(
+                        LocalContext.current.applicationContext
+                                as Application)
+                )
 
         }
     }
@@ -86,10 +98,11 @@ fun GameScreen(navController: NavController) {
     var bothBtnColor by rememberSaveable { mutableStateOf(primaryColor.toArgb())}
 
     val question = suffledQuestions!![mCurrentPosition]
+    val maximun = mQuestionsList.size
+
 
     //var min by rememberSaveable { mutableStateOf(0) }
     var sec by rememberSaveable { mutableStateOf(0) }
-
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -125,7 +138,11 @@ fun GameScreen(navController: NavController) {
                     datingBtnColor = primaryColor.toArgb()
                     relatedBtnColor = primaryColor.toArgb()
                     bothBtnColor = primaryColor.toArgb()
-                    mCurrentPosition++
+                    if(mCurrentPosition == maximun-1){
+                        navController.navigate(Screen.EndGameScreen.route)
+                    }else{
+                        mCurrentPosition++
+                    }
                 }, 500)
             },
             colors = ButtonDefaults.buttonColors(backgroundColor = Color(datingBtnColor))
@@ -147,7 +164,11 @@ fun GameScreen(navController: NavController) {
                     datingBtnColor = primaryColor.toArgb()
                     relatedBtnColor = primaryColor.toArgb()
                     bothBtnColor = primaryColor.toArgb()
-                    mCurrentPosition++
+                    if(mCurrentPosition == maximun-1){
+                        navController.navigate(Screen.EndGameScreen.route)
+                    }else{
+                        mCurrentPosition++
+                    }
                 }, 500)
             },
             colors = ButtonDefaults.buttonColors(backgroundColor = Color(relatedBtnColor))
@@ -169,7 +190,12 @@ fun GameScreen(navController: NavController) {
                     datingBtnColor = primaryColor.toArgb()
                     relatedBtnColor = primaryColor.toArgb()
                     bothBtnColor = primaryColor.toArgb()
-                    mCurrentPosition++
+
+                    if(mCurrentPosition == maximun-1){
+                        navController.navigate(Screen.EndGameScreen.route)
+                    }else{
+                        mCurrentPosition++
+                    }
                 }, 500)
             },
             colors = ButtonDefaults.buttonColors(backgroundColor = Color(bothBtnColor))

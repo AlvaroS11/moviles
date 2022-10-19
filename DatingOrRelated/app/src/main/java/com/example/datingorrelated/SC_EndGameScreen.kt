@@ -13,7 +13,8 @@ import androidx.navigation.NavController
 
 
 @Composable
-fun MainScreen(navController: NavController) {
+fun EndGameScreen(navController: NavController) {
+
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -22,62 +23,38 @@ fun MainScreen(navController: NavController) {
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Text(
-            text = "Dating or related?",
+            text = "Fin de la partida!",
             fontSize = 32.sp,
             color = MaterialTheme.colors.primary,
             modifier = Modifier.fillMaxWidth(),
             textAlign = TextAlign.Center
         )
+        Text(
+            text = "Estos son tus resultados:",
+            fontSize = 24.sp,
+            color = MaterialTheme.colors.primary,
+            modifier = Modifier.fillMaxWidth(),
+            textAlign = TextAlign.Left
+        )
         Button(
             onClick = {
-                navController.navigate(Screen.GameScreen.route);
+                navController.navigate(Screen.MainScreen.route);
             },
             colors = ButtonDefaults.buttonColors(backgroundColor = MaterialTheme.colors.background)
         ) {
             Text(
-                text = "Start Game!",
+                text = "Volver a inicio",
                 fontSize = 32.sp,
                 color = MaterialTheme.colors.primary,
                 modifier = Modifier.fillMaxWidth(),
                 textAlign = TextAlign.Center
             )
         }
-        Button(
-            onClick = {
-                navController.navigate(Screen.CreditsScreen.route);
-            },
-            colors = ButtonDefaults.buttonColors(backgroundColor = MaterialTheme.colors.background)
-        ) {
-            Text(
-                text = "Credits",
-                fontSize = 32.sp,
-                color = MaterialTheme.colors.primary,
-                modifier = Modifier.fillMaxWidth(),
-                textAlign = TextAlign.Center
-            )
-        }
-
-
-        Button(
-            onClick = {
-                navController.navigate(Screen.RankingScreen.route);
-            },
-            colors = ButtonDefaults.buttonColors(backgroundColor = MaterialTheme.colors.background)
-        ) {
-            Text(
-                text = "Ranking",
-                fontSize = 32.sp,
-                color = MaterialTheme.colors.primary,
-                modifier = Modifier.fillMaxWidth(),
-                textAlign = TextAlign.Center
-            )
-        }
-
         val activity = (LocalContext.current as? Activity)
 
         Button(
             onClick = {
-                      activity?.finish()
+                activity?.finish()
             },
         ) {
             Text(
