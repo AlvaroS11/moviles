@@ -64,9 +64,10 @@ class MainActivity : ComponentActivity() {
                     "GameViewModel",
                     GameViewModelFactory(
                         LocalContext.current.applicationContext
-                                as Application)
+                                as Application
+                    )
                 )
-
+            }
         }
     }
 }
@@ -382,6 +383,7 @@ fun timerScreen(minutos: Int, segundos: Int, addCount: () -> Unit = {}){
     )
     addCount
 }
+
 
 
 /*
