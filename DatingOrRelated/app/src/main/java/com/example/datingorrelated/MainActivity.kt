@@ -47,8 +47,6 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 
-
-
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -72,11 +70,9 @@ class MainActivity : ComponentActivity() {
     }
 }
 
-
-
 // ---------- GAME SCREEN -----------
 
-//region GameScreen Variables
+//region GameScreen Global Variables
 
 data class Response(var _datingBtnColor: Int, var _relatedBtnColor: Int, var _bothBtnColor: Int, var _correct: Int)
 
@@ -92,6 +88,7 @@ fun GameScreen(navController: NavController) {
 
     var mCurrentPosition by rememberSaveable { mutableStateOf(0) }
 
+    var canClick by rememberSaveable { mutableStateOf(true) }
     var correct by rememberSaveable { mutableStateOf(0) }
 
     var datingBtnColor by rememberSaveable { mutableStateOf(primaryColor.toArgb())}
@@ -99,8 +96,7 @@ fun GameScreen(navController: NavController) {
     var bothBtnColor by rememberSaveable { mutableStateOf(primaryColor.toArgb())}
 
     val question = suffledQuestions!![mCurrentPosition]
-    val maximun = mQuestionsList.size
-
+    val maximum = mQuestionsList.size
 
     //var min by rememberSaveable { mutableStateOf(0) }
     var sec by rememberSaveable { mutableStateOf(0) }
@@ -127,24 +123,35 @@ fun GameScreen(navController: NavController) {
         // Dating button
         Button(
             onClick = {
-                print(testingSeconds)
-                val(_datingBtnColor, _relatedBtnColor, _bothBtnColor, _correct) = handleResponse("Dating", question, correct)
+                if (canClick){
+                    canClick = false // it has just clicked, so it can't click again
 
-                datingBtnColor = _datingBtnColor
-                relatedBtnColor = _relatedBtnColor
-                bothBtnColor = _bothBtnColor
-                correct = _correct
+                    print(testingSeconds)
 
-                Handler(Looper.getMainLooper()).postDelayed({
-                    datingBtnColor = primaryColor.toArgb()
-                    relatedBtnColor = primaryColor.toArgb()
-                    bothBtnColor = primaryColor.toArgb()
-                    if(mCurrentPosition == maximun-1){
-                        navController.navigate(Screen.EndGameScreen.route)
-                    }else{
-                        mCurrentPosition++
-                    }
-                }, 500)
+                    val(_datingBtnColor, _relatedBtnColor, _bothBtnColor, _correct) = handleResponse("Dating", question, correct)
+
+                    // reasign colors based on answer
+                    datingBtnColor = _datingBtnColor
+                    relatedBtnColor = _relatedBtnColor
+                    bothBtnColor = _bothBtnColor
+                    correct = _correct
+
+                    Handler(Looper.getMainLooper()).postDelayed({
+                        canClick = true // when the time passes, we go to the next question, so user is able to click again
+
+                        // change color back to default
+                        datingBtnColor = primaryColor.toArgb()
+                        relatedBtnColor = primaryColor.toArgb()
+                        bothBtnColor = primaryColor.toArgb()
+
+                        if(mCurrentPosition == maximum-1){
+                            navController.navigate(Screen.EndGameScreen.route) // go to end screen
+                        }else{
+                            mCurrentPosition++ // go to next question
+                        }
+                    }, 500)
+                }
+
             },
             colors = ButtonDefaults.buttonColors(backgroundColor = Color(datingBtnColor))
         ) {
@@ -153,24 +160,35 @@ fun GameScreen(navController: NavController) {
         // Related button
         Button(
             onClick = {
+                if (canClick){
+                    canClick = false // it has just clicked, so it can't click again
 
-                val(_datingBtnColor, _relatedBtnColor, _bothBtnColor, _correct) = handleResponse("Related", question, correct)
+                    print(testingSeconds)
 
-                datingBtnColor = _datingBtnColor
-                relatedBtnColor = _relatedBtnColor
-                bothBtnColor = _bothBtnColor
-                correct = _correct
+                    val(_datingBtnColor, _relatedBtnColor, _bothBtnColor, _correct) = handleResponse("Related", question, correct)
 
-                Handler(Looper.getMainLooper()).postDelayed({
-                    datingBtnColor = primaryColor.toArgb()
-                    relatedBtnColor = primaryColor.toArgb()
-                    bothBtnColor = primaryColor.toArgb()
-                    if(mCurrentPosition == maximun-1){
-                        navController.navigate(Screen.EndGameScreen.route)
-                    }else{
-                        mCurrentPosition++
-                    }
-                }, 500)
+                    // reasign colors based on answer
+                    datingBtnColor = _datingBtnColor
+                    relatedBtnColor = _relatedBtnColor
+                    bothBtnColor = _bothBtnColor
+                    correct = _correct
+
+                    Handler(Looper.getMainLooper()).postDelayed({
+                        canClick = true // when the time passes, we go to the next question, so user is able to click again
+
+                        // change color back to default
+                        datingBtnColor = primaryColor.toArgb()
+                        relatedBtnColor = primaryColor.toArgb()
+                        bothBtnColor = primaryColor.toArgb()
+
+                        if(mCurrentPosition == maximum-1){
+                            navController.navigate(Screen.EndGameScreen.route) // go to end screen
+                        }else{
+                            mCurrentPosition++ // go to next question
+                        }
+                    }, 500)
+                }
+
             },
             colors = ButtonDefaults.buttonColors(backgroundColor = Color(relatedBtnColor))
         ) {
@@ -179,25 +197,34 @@ fun GameScreen(navController: NavController) {
         // Both button
         Button(
             onClick = {
+                if (canClick){
+                    canClick = false // it has just clicked, so it can't click again
 
-                val(_datingBtnColor, _relatedBtnColor, _bothBtnColor, _correct) = handleResponse("Both", question, correct)
+                    print(testingSeconds)
 
-                datingBtnColor = _datingBtnColor
-                relatedBtnColor = _relatedBtnColor
-                bothBtnColor = _bothBtnColor
-                correct = _correct
+                    val(_datingBtnColor, _relatedBtnColor, _bothBtnColor, _correct) = handleResponse("Both", question, correct)
 
-                Handler(Looper.getMainLooper()).postDelayed({
-                    datingBtnColor = primaryColor.toArgb()
-                    relatedBtnColor = primaryColor.toArgb()
-                    bothBtnColor = primaryColor.toArgb()
+                    // reasign colors based on answer
+                    datingBtnColor = _datingBtnColor
+                    relatedBtnColor = _relatedBtnColor
+                    bothBtnColor = _bothBtnColor
+                    correct = _correct
 
-                    if(mCurrentPosition == maximun-1){
-                        navController.navigate(Screen.EndGameScreen.route)
-                    }else{
-                        mCurrentPosition++
-                    }
-                }, 500)
+                    Handler(Looper.getMainLooper()).postDelayed({
+                        canClick = true // when the time passes, we go to the next question, so user is able to click again
+
+                        // change color back to default
+                        datingBtnColor = primaryColor.toArgb()
+                        relatedBtnColor = primaryColor.toArgb()
+                        bothBtnColor = primaryColor.toArgb()
+
+                        if(mCurrentPosition == maximum-1){
+                            navController.navigate(Screen.EndGameScreen.route) // go to end screen
+                        }else{
+                            mCurrentPosition++ // go to next question
+                        }
+                    }, 500)
+                }
             },
             colors = ButtonDefaults.buttonColors(backgroundColor = Color(bothBtnColor))
         ) {
@@ -224,6 +251,7 @@ fun GameScreen(navController: NavController) {
     }
 }
 
+//region Questions related methods
 fun handleResponse(button: String, question: Question, correct: Int): Response{
     var _datingBtnColor = 0
     var _bothBtnColor = 0
@@ -322,6 +350,9 @@ fun QuestionImage(image: Int) {
     )
 }
 
+//endregion
+
+//region Timer related methods
 @Preview
 @Composable
 fun timer() {
@@ -415,4 +446,5 @@ fun timer() {
     println(testingSeconds)
 }*/
 
+//endregion
 
