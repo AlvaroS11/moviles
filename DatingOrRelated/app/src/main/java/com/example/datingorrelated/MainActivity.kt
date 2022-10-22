@@ -46,6 +46,7 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import kotlin.time.Duration.Companion.seconds
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -98,6 +99,9 @@ fun GameScreen(navController: NavController) {
     val question = suffledQuestions!![mCurrentPosition]
     val maximum = mQuestionsList.size
 
+    var answerSeconds = 10
+    var secondsToDisappear by rememberSaveable { mutableStateOf(answerSeconds) }
+
     //var min by rememberSaveable { mutableStateOf(0) }
     var sec by rememberSaveable { mutableStateOf(0) }
     Column(
@@ -113,7 +117,7 @@ fun GameScreen(navController: NavController) {
         //handleTime(min, sec)
         CorrectAnswersText(number = correct)
         QuestionText(question.question)
-        Row(
+        Row( // Images
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.Center
         ) {
@@ -125,6 +129,8 @@ fun GameScreen(navController: NavController) {
             onClick = {
                 if (canClick){
                     canClick = false // it has just clicked, so it can't click again
+
+                    secondsToDisappear = answerSeconds // the user has answered, rewind timer
 
                     print(testingSeconds)
 
@@ -163,6 +169,8 @@ fun GameScreen(navController: NavController) {
                 if (canClick){
                     canClick = false // it has just clicked, so it can't click again
 
+                    secondsToDisappear = answerSeconds // the user has answered, rewind timer
+
                     print(testingSeconds)
 
                     val(_datingBtnColor, _relatedBtnColor, _bothBtnColor, _correct) = handleResponse("Related", question, correct)
@@ -200,6 +208,8 @@ fun GameScreen(navController: NavController) {
                 if (canClick){
                     canClick = false // it has just clicked, so it can't click again
 
+                    secondsToDisappear = answerSeconds // the user has answered, rewind timer
+
                     print(testingSeconds)
 
                     val(_datingBtnColor, _relatedBtnColor, _bothBtnColor, _correct) = handleResponse("Both", question, correct)
@@ -231,23 +241,21 @@ fun GameScreen(navController: NavController) {
             ButtonText("Both")
         }
 
+        TimerText(secondsToDisappear)
 
-        //PAUSE BUTTON
-        Button(
-            onClick = {
-                navController.navigate(Screen.PauseScreen.route);
-            },
-            colors = ButtonDefaults.buttonColors(backgroundColor = MaterialTheme.colors.background)
-        ) {
-            Text(
-                text = "Pause",
-                fontSize = 20.sp,
-                color = MaterialTheme.colors.primary,
-                modifier = Modifier.weight(0.25f),
-                textAlign = TextAlign.Right
-            )
+    } // end column
+
+    // To manage the answer time
+    LaunchedEffect(Unit) {
+        while(true){
+            while (secondsToDisappear >= 0) {
+                delay(1.seconds)
+                secondsToDisappear -= 1
+            }
+            // time has passed and the user hasn't responded, go to next question
+            mCurrentPosition++
+            secondsToDisappear = answerSeconds
         }
-
     }
 }
 
@@ -309,11 +317,26 @@ fun handleResponse(button: String, question: Question, correct: Int): Response{
 }
 
 @Composable
+fun TimerText(number: Int){
+    var color = MaterialTheme.colors.primary
+    if (number == 0){
+        color = Color.Red
+    }
+
+    Text(
+        text = "TimeLeft: $number",
+        fontSize = 24.sp,
+        color = color,
+        textAlign = TextAlign.Center
+    )
+}
+
+@Composable
 fun CorrectAnswersText(number: Int){
     Text(
         text = "Correct answers: $number",
         fontSize = 24.sp,
-        color = MaterialTheme.colors.onPrimary,
+        color = MaterialTheme.colors.primary,
         textAlign = TextAlign.Center
     )
 }
