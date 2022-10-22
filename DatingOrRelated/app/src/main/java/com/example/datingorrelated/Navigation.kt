@@ -5,9 +5,11 @@ import androidx.compose.runtime.*
 
 import androidx.navigation.NavController
 import androidx.navigation.NavHost
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
 
 @Composable
 fun Navigation(){
@@ -25,8 +27,13 @@ fun Navigation(){
         composable(route = Screen.PauseScreen.route){
             Pause(navController = navController)
         }
-        composable(route = Screen.EndGameScreen.route){
-            EndGameScreen(navController = navController)
+        composable(route = Screen.EndGameScreen.route,
+            arguments = listOf(
+                navArgument("correct"){
+                    type = NavType.IntType
+                })
+        ){ entry ->
+            EndGameScreen(navController = navController, correct = entry.arguments!!.getInt("correct"))
         }
         composable(route = Screen.RankingScreen.route){
             //Ranking()
