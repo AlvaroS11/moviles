@@ -1,6 +1,7 @@
 package com.example.datingorrelated
 
 import android.app.Activity
+import android.content.Context
 import android.content.res.Configuration
 import android.media.MediaPlayer
 import android.provider.MediaStore.Audio.Media
@@ -20,6 +21,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.datastore.core.DataStore
 import androidx.navigation.NavController
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
@@ -47,7 +49,7 @@ fun TopBar(scope: CoroutineScope, scaffoldState: ScaffoldState){
 }
 
 @Composable
-fun RaddioButtonTimeDifficulty() {
+fun RaddioButtonTimeDifficulty(scope: CoroutineScope, context: Context, dataStore: StoreUserSettings) {
     val radioOptions = listOf("Easy", "Normal", "Difficult")
     val (selectedOption, onOptionSelected) = remember { mutableStateOf(radioOptions.first()) }
     Column (modifier = Modifier.fillMaxWidth(),
@@ -77,6 +79,10 @@ fun RaddioButtonTimeDifficulty() {
                             "Difficult" -> {
                                 answerTime = 5
                             }
+                        }
+
+                        scope.launch{
+                            dataStore.saveQuestionTime(answerTime.toString())
                         }
                     }
                 )
@@ -114,11 +120,11 @@ fun HandleDarkTheme(){
 }
 
 @Composable
-fun Drawer(){
+fun Drawer(scope: CoroutineScope, context: Context, dataStore: StoreUserSettings){
     Column {
         HandleDarkTheme()
         //HandleMainTheme(mediaPlayer)
-        RaddioButtonTimeDifficulty()
+        RaddioButtonTimeDifficulty(scope, context, dataStore)
     }
 }
 //endregion
@@ -127,14 +133,22 @@ fun Drawer(){
 fun MainScreen(navController: NavController) {
     // Scaffold is a layout which implements the basic material design layout structure
     // With it we can add a top bar and a drawer for the options menu
+
     val scaffoldState = rememberScaffoldState()
     val scope = rememberCoroutineScope()
+    val context = LocalContext.current
+    val dataStore = StoreUserSettings(context)
+
+    val answerTimeString = dataStore.getQuestionTime.collectAsState(initial = "")
+    if(answerTimeString.value!! != ""){
+        answerTime = answerTimeString.value!!.toInt()
+    }
 
     Scaffold(
         scaffoldState = scaffoldState,
         topBar = {TopBar(scope, scaffoldState)},
         content = {MainScreenContent(navController = navController)},
-        drawerContent = {Drawer()}
+        drawerContent = {Drawer(scope, context, dataStore)}
 
     )
 }
@@ -149,6 +163,7 @@ fun MainScreenContent(navController: NavController){
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
+        Text(text = "Time: "+ answerTime)
         Text(
             text = "Dating or related?",
             fontSize = 32.sp,
