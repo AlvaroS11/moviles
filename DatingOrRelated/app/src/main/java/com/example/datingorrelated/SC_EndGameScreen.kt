@@ -13,7 +13,7 @@ import androidx.navigation.NavController
 
 
 @Composable
-fun EndGameScreen(navController: NavController) {
+fun EndGameScreen(navController: NavController, correct: Int) {
 
     Column(
         modifier = Modifier
@@ -30,7 +30,7 @@ fun EndGameScreen(navController: NavController) {
             textAlign = TextAlign.Center
         )
         Text(
-            text = "Estos son tus resultados:",
+            text = "Estos son tus resultados: $correct",
             fontSize = 24.sp,
             color = MaterialTheme.colors.primary,
             modifier = Modifier.fillMaxWidth(),

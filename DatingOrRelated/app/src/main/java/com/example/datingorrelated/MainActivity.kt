@@ -37,6 +37,7 @@ import kotlinx.coroutines.delay
 import kotlin.math.min
 import kotlin.random.Random
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.selection.selectable
 import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewmodel.compose.LocalViewModelStoreOwner
@@ -53,7 +54,6 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             Navigation()
-
 
             val owner = LocalViewModelStoreOwner.current
 
@@ -73,7 +73,7 @@ class MainActivity : ComponentActivity() {
 
 // ---------- GAME SCREEN -----------
 
-//region GameScreen Global Variables
+//region GameScreen Global Variables Region
 
 data class Response(var _datingBtnColor: Int, var _relatedBtnColor: Int, var _bothBtnColor: Int, var _correct: Int)
 
@@ -85,25 +85,30 @@ var testingSeconds = 0
 
 @Composable
 fun GameScreen(navController: NavController) {
+
+    //region --- Region Variables ---
+
+    // To change the color of the buttons based on the answer
     var primaryColor = MaterialTheme.colors.primary
-
-    var mCurrentPosition by rememberSaveable { mutableStateOf(0) }
-
-    var canClick by rememberSaveable { mutableStateOf(true) }
-    var correct by rememberSaveable { mutableStateOf(0) }
-
     var datingBtnColor by rememberSaveable { mutableStateOf(primaryColor.toArgb())}
     var relatedBtnColor by rememberSaveable { mutableStateOf(primaryColor.toArgb())}
     var bothBtnColor by rememberSaveable { mutableStateOf(primaryColor.toArgb())}
 
+    // To manage the questions
+    var mCurrentPosition by rememberSaveable { mutableStateOf(0) }
     val question = suffledQuestions!![mCurrentPosition]
     val maximum = mQuestionsList.size
+    var canClick by rememberSaveable { mutableStateOf(true) }
+    var correct by rememberSaveable { mutableStateOf(0) }
 
-    var answerSeconds = 10
-    var secondsToDisappear by rememberSaveable { mutableStateOf(answerSeconds) }
+    // To manage the answer timer
+    var secondsToDisappear by rememberSaveable { mutableStateOf(answerTime) }
 
     //var min by rememberSaveable { mutableStateOf(0) }
     var sec by rememberSaveable { mutableStateOf(0) }
+
+    //endregion
+
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -130,7 +135,7 @@ fun GameScreen(navController: NavController) {
                 if (canClick){
                     canClick = false // it has just clicked, so it can't click again
 
-                    secondsToDisappear = answerSeconds // the user has answered, rewind timer
+                    secondsToDisappear = answerTime // the user has answered, rewind timer
 
                     print(testingSeconds)
 
@@ -151,7 +156,7 @@ fun GameScreen(navController: NavController) {
                         bothBtnColor = primaryColor.toArgb()
 
                         if(mCurrentPosition == maximum-1){
-                            navController.navigate(Screen.EndGameScreen.route) // go to end screen
+                            navController.navigate(Screen.EndGameScreen.createRoute(correct)) // go to end screen
                         }else{
                             mCurrentPosition++ // go to next question
                         }
@@ -169,7 +174,7 @@ fun GameScreen(navController: NavController) {
                 if (canClick){
                     canClick = false // it has just clicked, so it can't click again
 
-                    secondsToDisappear = answerSeconds // the user has answered, rewind timer
+                    secondsToDisappear = answerTime // the user has answered, rewind timer
 
                     print(testingSeconds)
 
@@ -190,7 +195,7 @@ fun GameScreen(navController: NavController) {
                         bothBtnColor = primaryColor.toArgb()
 
                         if(mCurrentPosition == maximum-1){
-                            navController.navigate(Screen.EndGameScreen.route) // go to end screen
+                            navController.navigate(Screen.EndGameScreen.createRoute(correct)) // go to end screen
                         }else{
                             mCurrentPosition++ // go to next question
                         }
@@ -208,7 +213,7 @@ fun GameScreen(navController: NavController) {
                 if (canClick){
                     canClick = false // it has just clicked, so it can't click again
 
-                    secondsToDisappear = answerSeconds // the user has answered, rewind timer
+                    secondsToDisappear = answerTime // the user has answered, rewind timer
 
                     print(testingSeconds)
 
@@ -229,7 +234,7 @@ fun GameScreen(navController: NavController) {
                         bothBtnColor = primaryColor.toArgb()
 
                         if(mCurrentPosition == maximum-1){
-                            navController.navigate(Screen.EndGameScreen.route) // go to end screen
+                            navController.navigate(Screen.EndGameScreen.createRoute(correct)) // go to end screen
                         }else{
                             mCurrentPosition++ // go to next question
                         }
@@ -243,7 +248,7 @@ fun GameScreen(navController: NavController) {
 
         TimerText(secondsToDisappear)
 
-    } // end column
+    }
 
     // To manage the answer time
     LaunchedEffect(Unit) {
@@ -254,7 +259,7 @@ fun GameScreen(navController: NavController) {
             }
             // time has passed and the user hasn't responded, go to next question
             mCurrentPosition++
-            secondsToDisappear = answerSeconds
+            secondsToDisappear = answerTime
         }
     }
 }
