@@ -16,8 +16,9 @@ import androidx.navigation.NavController
 
 
 @Composable
-fun EndGameScreen(navController: NavController, correct: Int, name: String, time: Int) {
-    save(name = name, time = time)
+fun EndGameScreen(navController: NavController, name: String,time: Int, correct: Int) {
+    println("CORRECT ANSWERS: " + correct)
+    save(name = name, time = time, score = correct)
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -80,7 +81,7 @@ fun EndGameScreen(navController: NavController, correct: Int, name: String, time
 }
 
 @Composable
-fun save(name: String, time: Int){
+fun save(name: String, time: Int, score: Int){
     val owner = LocalViewModelStoreOwner.current
     owner?.let {
         val viewModel: GameViewModel = viewModel(
@@ -94,7 +95,8 @@ fun save(name: String, time: Int){
         viewModel.insertProduct(
             GameStats(
                 name,
-                time
+                time,
+                score
             )
         )
     }

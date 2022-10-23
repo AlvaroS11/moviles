@@ -16,15 +16,18 @@ class GameStats {
     @ColumnInfo(name = "playerName")
     var playerName: String = ""
     var timeSecs: Int = 0
+    var score: Int = 0
 
     constructor() {}
 
-    constructor(id: Int, productname: String, timesecs: Int) {
+    constructor(id: Int, productname: String, timesecs: Int, score: Int) {
         this.playerName = productname
         this.timeSecs = timesecs
+        this.score = score
     }
-    constructor(playername: String, timesecs: Int) {
+    constructor(playername: String, timesecs: Int, score: Int) {
         this.playerName = playername
         this.timeSecs = timesecs
+        this.score = score
     }
 }

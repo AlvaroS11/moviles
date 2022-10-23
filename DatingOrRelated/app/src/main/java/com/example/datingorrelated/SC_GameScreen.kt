@@ -1,6 +1,5 @@
 package com.example.datingorrelated
 
-import android.app.Application
 import android.os.Handler
 import android.os.Looper
 import androidx.compose.foundation.Image
@@ -15,15 +14,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewmodel.compose.LocalViewModelStoreOwner
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import kotlinx.coroutines.delay
 import kotlin.time.Duration.Companion.seconds
@@ -112,7 +106,7 @@ fun GameScreen(navController: NavController, mapName: String) {
 
                         if(mCurrentPosition == maximum-1){
                             navController.navigate(Screen.EndGameScreen.createRoute(correct, mapName, testingSeconds))
-                            println("TIEMPO:::: " + testingSeconds)
+                            println("Dating " + correct)
 // go to end screen
                         }else{
                             mCurrentPosition++ // go to next question
@@ -153,7 +147,7 @@ fun GameScreen(navController: NavController, mapName: String) {
 
                         if(mCurrentPosition == maximum-1){
                             navController.navigate(Screen.EndGameScreen.createRoute(correct, mapName, testingSeconds)) // go to end screen
-                            println("TIEMPO:::: " + testingSeconds)
+                            println("Related " + correct)
 
                         }else{
                             mCurrentPosition++ // go to next question
@@ -176,7 +170,7 @@ fun GameScreen(navController: NavController, mapName: String) {
 
                     print(testingSeconds)
 
-                    val(_datingBtnColor, _relatedBtnColor, _bothBtnColor, _correct) = handleResponse("Both", question, testingSeconds)
+                    val(_datingBtnColor, _relatedBtnColor, _bothBtnColor, _correct) = handleResponse("Both", question, correct)
 
                     // reasign colors based on answer
                     datingBtnColor = _datingBtnColor
@@ -194,7 +188,7 @@ fun GameScreen(navController: NavController, mapName: String) {
 
                         if(mCurrentPosition == maximum-1){
                             navController.navigate(Screen.EndGameScreen.createRoute(correct, mapName, testingSeconds)) // go to end screen
-                            println("TIEMPO:::: " + testingSeconds)
+                            println("Both " + correct)
 
                         }else{
                             mCurrentPosition++ // go to next question
@@ -225,7 +219,7 @@ fun GameScreen(navController: NavController, mapName: String) {
             // time has passed and the user hasn't responded, go to next question
             if(mCurrentPosition == maximum-1){
                 navController.navigate(Screen.EndGameScreen.createRoute(correct, mapName, testingSeconds)) // go to end screen
-                println("TIEMPO:::: " + testingSeconds)
+                println("Time " + correct)
             }else{
                 mCurrentPosition++ // go to next question
                 secondsToDisappear = answerTime // restore time

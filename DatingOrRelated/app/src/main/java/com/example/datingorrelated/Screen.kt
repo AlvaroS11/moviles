@@ -9,8 +9,8 @@ sealed class Screen (val route: String){
     object CreditsScreen : Screen(route = "credits_screen")
     object PauseScreen : Screen(route = "pause_screen")
 
-    object EndGameScreen : Screen(route = "endGame_screen/{correct}/{name}/{time}"){
-        fun createRoute(correct: Int, name:String, time: Int) = "endGame_screen/$correct/$name/$time"
+    object EndGameScreen : Screen(route = "endGame_screen/{name}/{time}/{correct}"){
+        fun createRoute(correct: Int, name: String, time: Int) = "endGame_screen/$name/$time/$correct"
     }
     object RankingScreen : Screen(route = "ranking_screen")
 

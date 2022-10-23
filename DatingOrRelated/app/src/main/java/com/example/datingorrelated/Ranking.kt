@@ -65,6 +65,7 @@ fun RankingSetUp(viewModel: GameViewModel, navController: NavController) {
 @Composable
 fun Ranking(allGames: List<GameStats>, searchResults: List<GameStats>, viewModel: GameViewModel, navController: NavController) {
     var gameName by remember { mutableStateOf("") }
+    var scorePoints by remember { mutableStateOf("") }
     var gameSecs by remember { mutableStateOf("") }
     var searching by remember { mutableStateOf(false) }
 
@@ -107,7 +108,8 @@ fun Ranking(allGames: List<GameStats>, searchResults: List<GameStats>, viewModel
                     viewModel.insertProduct(
                         GameStats(
                             gameName,
-                            gameSecs.toInt()
+                            gameSecs.toInt(),
+                            scorePoints.toInt()
                         )
                     )
                     searching = false
@@ -117,6 +119,7 @@ fun Ranking(allGames: List<GameStats>, searchResults: List<GameStats>, viewModel
                     viewModel.insertProduct(
                         GameStats(
                             gameName,
+                            0,
                             0
                         )
                     )
@@ -159,13 +162,13 @@ fun Ranking(allGames: List<GameStats>, searchResults: List<GameStats>, viewModel
             val list = if (searching) searchResults else allGames
 
             item {
-                TitleRow(head1 = "Id", head2 = "Player Name", head3 = "Score")
+                TitleRow(head1 = "Id", head2 = "Player Name", head3 = "Time", head4 = "Score")
             }
 
             items(list) { game ->
                 GameRow(
                     id = game.id, name = game.playerName,
-                    gameSecs = game.timeSecs
+                    gameSecs = game.timeSecs, scorePoints = game.score
                 )
             }
         }
@@ -188,7 +191,7 @@ fun Ranking(allGames: List<GameStats>, searchResults: List<GameStats>, viewModel
 }
 
 @Composable
-fun TitleRow(head1: String, head2: String, head3: String) {
+fun TitleRow(head1: String, head2: String, head3: String, head4: String) {
     Row(
         modifier = Modifier
             .background(MaterialTheme.colors.primary)
@@ -203,11 +206,13 @@ fun TitleRow(head1: String, head2: String, head3: String) {
                 .weight(0.2f))
         Text(head3, color = Color.White,
             modifier = Modifier.weight(0.2f))
+        Text(head4, color = Color.White,
+            modifier = Modifier.weight(0.2f))
     }
 }
 
 @Composable
-fun GameRow(id: Int, name: String, gameSecs: Int) {
+fun GameRow(id: Int, name: String, gameSecs: Int, scorePoints: Int) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -217,6 +222,7 @@ fun GameRow(id: Int, name: String, gameSecs: Int) {
             .weight(0.1f))
         Text(name, modifier = Modifier.weight(0.2f))
         Text(gameSecs.toString(), modifier = Modifier.weight(0.2f))
+        Text(scorePoints.toString(), modifier = Modifier.weight(0.2f))
     }
 }
 

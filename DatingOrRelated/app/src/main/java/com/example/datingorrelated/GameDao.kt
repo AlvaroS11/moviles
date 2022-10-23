@@ -18,7 +18,7 @@ interface GameDao {
     @Query("DELETE FROM gameStats WHERE playerName = :name")
     fun deleteGame(name: String)
 
-    @Query("SELECT * FROM gameStats ORDER BY timeSecs")
+    @Query("SELECT * FROM gameStats ORDER BY score DESC, timeSecs ASC")
     fun getAllGame(): LiveData<List<GameStats>>
 }
 

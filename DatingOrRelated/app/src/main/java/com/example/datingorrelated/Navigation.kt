@@ -35,20 +35,21 @@ fun Navigation(){
         }
         composable(route = Screen.EndGameScreen.route,
             arguments = listOf(
-                navArgument("correct") {
-                    type = NavType.IntType
-                }, navArgument("name"){
+                navArgument("name"){
                     type = NavType.StringType
                 },
                 navArgument("time"){
+                    type = NavType.IntType
+                },
+                navArgument("correct") {
                     type = NavType.IntType
                 }
             )
         ){ entry ->
             EndGameScreen(navController = navController,
-                correct = entry.arguments!!.getInt("correct"),
                 name = entry.arguments!!.getString("name").toString(),
-                time = entry.arguments!!.getInt("time")
+                time = entry.arguments!!.getInt("time"),
+                correct = entry.arguments!!.getInt("correct"),
             )
         }
         composable(route = Screen.RankingScreen.route){
