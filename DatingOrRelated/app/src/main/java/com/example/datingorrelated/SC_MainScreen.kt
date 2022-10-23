@@ -49,20 +49,16 @@ fun TopBar(scope: CoroutineScope, scaffoldState: ScaffoldState){
 }
 
 @Composable
-fun RaddioButtonTimeDifficulty(scope: CoroutineScope, context: Context, dataStore: StoreUserSettings) {
-    val radioOptions = listOf("Easy", "Normal", "Difficult")
+fun RadioButtonTimeDifficulty(scope: CoroutineScope, context: Context, dataStore: StoreUserSettings) {
+    val radioOptions = listOf("Easy: 20 seconds", "Normal: 10 seconds", "Difficult: 5 seconds")
     val (selectedOption, onOptionSelected) = remember { mutableStateOf(radioOptions.first()) }
-    Column (modifier = Modifier.fillMaxWidth(),
-        horizontalAlignment = Alignment.CenterHorizontally,){
-        Text(text = "Time difficulty", modifier = Modifier.padding(bottom = 16.dp))
+    Column (modifier = Modifier.fillMaxWidth().padding(top = 16.dp),
+        horizontalAlignment = Alignment.CenterHorizontally){
+        Text(text = "Time difficulty (seconds per question)", modifier = Modifier.padding(bottom = 16.dp))
         radioOptions.forEach { text ->
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .selectable(
-                        selected = (text == selectedOption),
-                        onClick = { onOptionSelected(text) }
-                    )
                     .padding(horizontal = 16.dp)
             ) {
                 RadioButton(
@@ -70,27 +66,26 @@ fun RaddioButtonTimeDifficulty(scope: CoroutineScope, context: Context, dataStor
                     onClick = {
                         onOptionSelected(text)
                         when (text){
-                            "Easy" -> {
+                            radioOptions[0] -> { // easy
                                 answerTime = 20
                             }
-                            "Normal" -> {
+                            radioOptions[1] -> { // normal
                                 answerTime = 10
                             }
-                            "Difficult" -> {
+                            radioOptions[2] -> { // difficult
                                 answerTime = 5
                             }
                         }
-
+                        // store the answer time on device
                         scope.launch{
                             dataStore.saveQuestionTime(answerTime.toString())
                         }
                     }
                 )
-                Text(
+                Text( // radio button text
                     text = text,
-                    modifier = Modifier.padding(start = 16.dp)
+                    modifier = Modifier.align(alignment = Alignment.CenterVertically)
                 )
-
             }
         }
     }
@@ -124,7 +119,7 @@ fun Drawer(scope: CoroutineScope, context: Context, dataStore: StoreUserSettings
     Column {
         HandleDarkTheme()
         //HandleMainTheme(mediaPlayer)
-        RaddioButtonTimeDifficulty(scope, context, dataStore)
+        RadioButtonTimeDifficulty(scope, context, dataStore)
     }
 }
 //endregion
