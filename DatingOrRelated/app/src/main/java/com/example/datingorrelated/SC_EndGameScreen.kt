@@ -1,6 +1,7 @@
 package com.example.datingorrelated
 
 import android.app.Activity
+import android.app.Application
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable
@@ -9,12 +10,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.LocalViewModelStoreOwner
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 
 
 @Composable
-fun EndGameScreen(navController: NavController, correct: Int) {
-
+fun EndGameScreen(navController: NavController, correct: Int, name: String, time: Int) {
+    save(name = name, time = time)
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -30,7 +33,14 @@ fun EndGameScreen(navController: NavController, correct: Int) {
             textAlign = TextAlign.Center
         )
         Text(
-            text = "Estos son tus resultados: $correct",
+            text = "Estos son tus resultados $name : $correct aciertos!",
+            fontSize = 24.sp,
+            color = MaterialTheme.colors.primary,
+            modifier = Modifier.fillMaxWidth(),
+            textAlign = TextAlign.Left
+        )
+        Text(
+            text = "En $time segundos",
             fontSize = 24.sp,
             color = MaterialTheme.colors.primary,
             modifier = Modifier.fillMaxWidth(),
@@ -38,6 +48,7 @@ fun EndGameScreen(navController: NavController, correct: Int) {
         )
         Button(
             onClick = {
+//                save(name = name, time = time)
                 navController.navigate(Screen.MainScreen.route);
             },
             colors = ButtonDefaults.buttonColors(backgroundColor = MaterialTheme.colors.background)
@@ -65,5 +76,26 @@ fun EndGameScreen(navController: NavController, correct: Int) {
                 textAlign = TextAlign.Center
             )
         }
+    }
+}
+
+@Composable
+fun save(name: String, time: Int){
+    val owner = LocalViewModelStoreOwner.current
+    owner?.let {
+        val viewModel: GameViewModel = viewModel(
+            it,
+            "GameViewModel",
+            GameViewModelFactory(
+                LocalContext.current.applicationContext
+                        as Application
+            )
+        )
+        viewModel.insertProduct(
+            GameStats(
+                name,
+                time
+            )
+        )
     }
 }

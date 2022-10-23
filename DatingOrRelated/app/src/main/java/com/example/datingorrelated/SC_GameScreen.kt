@@ -1,5 +1,6 @@
 package com.example.datingorrelated
 
+import android.app.Application
 import android.os.Handler
 import android.os.Looper
 import androidx.compose.foundation.Image
@@ -14,11 +15,14 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewmodel.compose.LocalViewModelStoreOwner
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import kotlinx.coroutines.delay
@@ -30,8 +34,11 @@ var mQuestionsList = Constants.getQuestions()
 var suffledQuestions = mQuestionsList.shuffled()
 var testingSeconds = 0
 
+
+
 @Composable
-fun GameScreen(navController: NavController) {
+fun GameScreen(navController: NavController, mapName: String) {
+    println("loadingGameScreen " + "$mapName")
 
     //region --- Variables Region ---
 
@@ -66,7 +73,7 @@ fun GameScreen(navController: NavController) {
     ) {
 
         //print(sec)
-        TopLevel()
+        //TopLevel()
         //handleTime(min, sec)
         CorrectAnswersText(number = correct)
         QuestionText(question.question)
@@ -104,7 +111,9 @@ fun GameScreen(navController: NavController) {
                         bothBtnColor = primaryColor.toArgb()
 
                         if(mCurrentPosition == maximum-1){
-                            navController.navigate(Screen.EndGameScreen.createRoute(correct)) // go to end screen
+                            navController.navigate(Screen.EndGameScreen.createRoute(correct, mapName, testingSeconds))
+                            println("TIEMPO:::: " + testingSeconds)
+// go to end screen
                         }else{
                             mCurrentPosition++ // go to next question
                         }
@@ -143,7 +152,9 @@ fun GameScreen(navController: NavController) {
                         bothBtnColor = primaryColor.toArgb()
 
                         if(mCurrentPosition == maximum-1){
-                            navController.navigate(Screen.EndGameScreen.createRoute(correct)) // go to end screen
+                            navController.navigate(Screen.EndGameScreen.createRoute(correct, mapName, testingSeconds)) // go to end screen
+                            println("TIEMPO:::: " + testingSeconds)
+
                         }else{
                             mCurrentPosition++ // go to next question
                         }
@@ -165,7 +176,7 @@ fun GameScreen(navController: NavController) {
 
                     print(testingSeconds)
 
-                    val(_datingBtnColor, _relatedBtnColor, _bothBtnColor, _correct) = handleResponse("Both", question, correct)
+                    val(_datingBtnColor, _relatedBtnColor, _bothBtnColor, _correct) = handleResponse("Both", question, testingSeconds)
 
                     // reasign colors based on answer
                     datingBtnColor = _datingBtnColor
@@ -182,7 +193,9 @@ fun GameScreen(navController: NavController) {
                         bothBtnColor = primaryColor.toArgb()
 
                         if(mCurrentPosition == maximum-1){
-                            navController.navigate(Screen.EndGameScreen.createRoute(correct)) // go to end screen
+                            navController.navigate(Screen.EndGameScreen.createRoute(correct, mapName, testingSeconds)) // go to end screen
+                            println("TIEMPO:::: " + testingSeconds)
+
                         }else{
                             mCurrentPosition++ // go to next question
                         }
@@ -195,7 +208,9 @@ fun GameScreen(navController: NavController) {
         }
 
         TimerText(secondsToDisappear)
-        Column(modifier = Modifier.fillMaxWidth().fillMaxHeight()){
+        Column(modifier = Modifier
+            .fillMaxWidth()
+            .fillMaxHeight()){
             Timer()
         }
     }
@@ -209,7 +224,8 @@ fun GameScreen(navController: NavController) {
             }
             // time has passed and the user hasn't responded, go to next question
             if(mCurrentPosition == maximum-1){
-                navController.navigate(Screen.EndGameScreen.createRoute(correct)) // go to end screen
+                navController.navigate(Screen.EndGameScreen.createRoute(correct, mapName, testingSeconds)) // go to end screen
+                println("TIEMPO:::: " + testingSeconds)
             }else{
                 mCurrentPosition++ // go to next question
                 secondsToDisappear = answerTime // restore time
@@ -344,7 +360,9 @@ fun Timer() {
         mutableStateOf(0)
     }
 
-    Row(modifier = Modifier.fillMaxWidth().fillMaxHeight()
+    Row(modifier = Modifier
+        .fillMaxWidth()
+        .fillMaxHeight()
     ){
         Icon(imageVector = Icons.Filled.Menu, // change this for a clock
             contentDescription = "Menu icon",
@@ -367,8 +385,10 @@ fun Timer() {
         else
             seconds++
     }
+    testingSeconds = seconds
 }
 
+/*
 //// are the following methods used for smthng ??
 
 class ViewModelTimer : ViewModel(){
@@ -393,6 +413,7 @@ fun TopLevel(model: ViewModelTimer = viewModel()){
     //timerScreen(minutos = model.totalMinutos, segundos = model.totalSegundos){model.addingTime()}
 }
 
+
 @Composable
 fun timerScreen(minutos: Int, segundos: Int, addCount: () -> Unit = {}){
     Text(
@@ -402,6 +423,67 @@ fun timerScreen(minutos: Int, segundos: Int, addCount: () -> Unit = {}){
         textAlign = TextAlign.Center
     )
     addCount
+}
+
+@Composable
+fun introduceName(viewModel: GameViewModel) {
+    var gameName by remember { mutableStateOf("") }
+    var gameSecs by remember { mutableStateOf("") }
+    var searching by remember { mutableStateOf(false) }
+
+    val onProductTextChange = { text: String ->
+        gameName = text
+    }
+
+    val ongameSecsTextChange = { text: String ->
+        gameSecs = text
+    }
+
+
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
+        modifier = Modifier
+            .fillMaxWidth()
+    ) {
+        CustomTextField(
+            title = "Player Name",
+            textState = gameName,
+            onTextChange = onProductTextChange,
+            keyboardType = KeyboardType.Text
+        )
+
+        Row(
+            horizontalArrangement = Arrangement.SpaceEvenly,
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(10.dp)
+        ) {
+            Button(onClick = {
+                if (gameSecs.isNotEmpty()) {
+                    viewModel.insertProduct(
+                        GameStats(
+                            gameName,
+                            gameSecs.toInt()
+                        )
+                    )
+                    searching = false
+                } else {
+                    println("JUST FOR DEBUG!!__SAVING WITHOUT SECONDS")
+                    viewModel.insertProduct(
+                        GameStats(
+                            gameName,
+                            0
+                        )
+                    )
+                    searching = false
+                }
+            }) {
+                Text("Add")
+            }
+
+
+        }
+    }
 }
 
 
@@ -436,3 +518,5 @@ fun timer() {
 }*/
 
 //endregion
+
+ */

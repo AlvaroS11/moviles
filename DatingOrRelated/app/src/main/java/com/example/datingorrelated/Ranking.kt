@@ -7,10 +7,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.Button
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.OutlinedTextField
-import androidx.compose.material.Text
+import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
@@ -20,6 +17,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.ViewModel
@@ -27,10 +25,11 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewmodel.compose.LocalViewModelStoreOwner
 import androidx.lifecycle.viewmodel.compose.LocalViewModelStoreOwner.current
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavController
 
 
 @Composable
-fun Ranking() {
+fun Ranking(navController: NavController) {
 
     val owner = LocalViewModelStoreOwner.current
 
@@ -44,13 +43,13 @@ fun Ranking() {
             )
         )
 
-        RankingSetUp(viewModel)
+        RankingSetUp(viewModel, navController = navController)
     }
 }
 
 
 @Composable
-fun RankingSetUp(viewModel: GameViewModel) {
+fun RankingSetUp(viewModel: GameViewModel, navController: NavController) {
 
     val allGames by viewModel.allGames.observeAsState(listOf())
     val searchResults by viewModel.searchResults.observeAsState(listOf())
@@ -58,12 +57,13 @@ fun RankingSetUp(viewModel: GameViewModel) {
     Ranking(
         allGames = allGames ,
         searchResults = searchResults ,
-        viewModel = viewModel
+        viewModel = viewModel,
+        navController = navController
     )
 }
 
 @Composable
-fun Ranking(allGames: List<GameStats>, searchResults: List<GameStats>, viewModel: GameViewModel) {
+fun Ranking(allGames: List<GameStats>, searchResults: List<GameStats>, viewModel: GameViewModel, navController: NavController) {
     var gameName by remember { mutableStateOf("") }
     var gameSecs by remember { mutableStateOf("") }
     var searching by remember { mutableStateOf(false) }
@@ -169,6 +169,20 @@ fun Ranking(allGames: List<GameStats>, searchResults: List<GameStats>, viewModel
                 )
             }
         }
+    }
+    Button(
+        onClick = {//CAMBIAR ESTO PARA HACER QUE VUELVA A DONDE ESTABA
+            navController.navigate(Screen.MainScreen.route);
+        },
+        colors = ButtonDefaults.buttonColors(backgroundColor = MaterialTheme.colors.background)
+    ) {
+        Text(
+            text = "Back To Menu",
+            fontSize = 32.sp,
+            color = MaterialTheme.colors.primary,
+            modifier = Modifier.fillMaxWidth(),
+            textAlign = TextAlign.Center
+        )
     }
 
 }

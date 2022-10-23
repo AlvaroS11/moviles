@@ -201,7 +201,7 @@ fun MainScreenContent(navController: NavController){
         )
         Button(
             onClick = {
-                navController.navigate(Screen.GameScreen.route);
+                navController.navigate(Screen.IntroName.route);
             },
             colors = ButtonDefaults.buttonColors(backgroundColor = MaterialTheme.colors.primary)
         ) {
