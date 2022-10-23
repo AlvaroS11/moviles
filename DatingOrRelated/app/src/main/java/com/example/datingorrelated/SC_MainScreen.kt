@@ -23,9 +23,12 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.datastore.core.DataStore
 import androidx.navigation.NavController
+import com.example.datingorrelated.ui.theme.DatingOrRelatedTheme
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
+// GLOBAL VARIABLES
+var preferredTheme = "" // by default it will be the system theme, otherwise it can be "Dark" or "Light"
 var answerTime = 20
 
 //region ---------- OPTIONS MENU REGION ----------
@@ -49,20 +52,18 @@ fun TopBar(scope: CoroutineScope, scaffoldState: ScaffoldState){
 }
 
 @Composable
-fun RaddioButtonTimeDifficulty(scope: CoroutineScope, context: Context, dataStore: StoreUserSettings) {
-    val radioOptions = listOf("Easy", "Normal", "Difficult")
+fun RadioButtonTimeDifficulty(scope: CoroutineScope, context: Context, dataStore: StoreUserSettings) {
+    val radioOptions = listOf("Easy: 20 seconds", "Normal: 10 seconds", "Difficult: 5 seconds")
     val (selectedOption, onOptionSelected) = remember { mutableStateOf(radioOptions.first()) }
-    Column (modifier = Modifier.fillMaxWidth(),
-        horizontalAlignment = Alignment.CenterHorizontally,){
-        Text(text = "Time difficulty", modifier = Modifier.padding(bottom = 16.dp))
+    Column (modifier = Modifier
+        .fillMaxWidth()
+        .padding(top = 16.dp),
+        horizontalAlignment = Alignment.CenterHorizontally){
+        Text(text = "Time difficulty (seconds per question)", modifier = Modifier.padding(bottom = 16.dp))
         radioOptions.forEach { text ->
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .selectable(
-                        selected = (text == selectedOption),
-                        onClick = { onOptionSelected(text) }
-                    )
                     .padding(horizontal = 16.dp)
             ) {
                 RadioButton(
@@ -70,34 +71,79 @@ fun RaddioButtonTimeDifficulty(scope: CoroutineScope, context: Context, dataStor
                     onClick = {
                         onOptionSelected(text)
                         when (text){
-                            "Easy" -> {
+                            radioOptions[0] -> { // easy
                                 answerTime = 20
                             }
-                            "Normal" -> {
+                            radioOptions[1] -> { // normal
                                 answerTime = 10
                             }
-                            "Difficult" -> {
+                            radioOptions[2] -> { // difficult
                                 answerTime = 5
                             }
                         }
-
+                        // store the answer time on device
                         scope.launch{
                             dataStore.saveQuestionTime(answerTime.toString())
                         }
                     }
                 )
-                Text(
+                Text( // radio button text
                     text = text,
-                    modifier = Modifier.padding(start = 16.dp)
+                    modifier = Modifier.align(alignment = Alignment.CenterVertically)
                 )
+            }
+        }
+    }
+}
 
+
+@Composable
+fun RadioButtonHandleTheme(scope: CoroutineScope, context: Context, dataStore: StoreUserSettings) {
+    val radioOptions = listOf("Dark", "Light", "Same as system")
+    val (selectedOption, onOptionSelected) = remember { mutableStateOf(radioOptions.first()) }
+    Column (modifier = Modifier
+        .fillMaxWidth()
+        .padding(top = 16.dp),
+        horizontalAlignment = Alignment.CenterHorizontally){
+        Text(text = "Light mode theme", modifier = Modifier.padding(bottom = 16.dp))
+        radioOptions.forEach { text ->
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp)
+            ) {
+                RadioButton(
+                    selected = (text == selectedOption),
+                    onClick = {
+                        onOptionSelected(text)
+                        when (text){
+                            radioOptions[0] -> { // easy
+                                preferredTheme = text
+                            }
+                            radioOptions[1] -> { // normal
+                                preferredTheme = text
+                            }
+                            radioOptions[2] -> { // difficult
+                                preferredTheme = text
+                            }
+                        }
+                        // store the answer time on device
+                        scope.launch{
+                            dataStore.savePreferredTheme(preferredTheme.toString())
+                        }
+                    }
+                )
+                Text( // radio button text
+                    text = text,
+                    modifier = Modifier.align(alignment = Alignment.CenterVertically)
+                )
             }
         }
     }
 }
 
 @Composable
-fun HandleMainTheme(mediaPlayer: MediaPlayer){
+fun HandleVolume(mediaPlayer: MediaPlayer){
     var sliderPosition by remember { mutableStateOf(1f) }
     Text(text = (sliderPosition*100).toInt().toString())
     Slider(value = sliderPosition,
@@ -108,29 +154,18 @@ fun HandleMainTheme(mediaPlayer: MediaPlayer){
 }
 
 @Composable
-fun HandleDarkTheme(){
-    var theme = isSystemInDarkTheme()
-    TextButton(onClick = {
-        if (theme) Configuration.UI_MODE_NIGHT_NO
-        else Configuration.UI_MODE_NIGHT_YES
-    }){
-        Text(text = "Night/Light mode",
-            modifier = Modifier.fillMaxWidth())
-    }
-}
-
-@Composable
 fun Drawer(scope: CoroutineScope, context: Context, dataStore: StoreUserSettings){
-    Column {
-        HandleDarkTheme()
-        //HandleMainTheme(mediaPlayer)
-        RaddioButtonTimeDifficulty(scope, context, dataStore)
+    Column (modifier = Modifier.background(MaterialTheme.colors.background).fillMaxHeight()) {
+        //HandleVolume()
+        RadioButtonHandleTheme(scope, context, dataStore)
+        RadioButtonTimeDifficulty(scope, context, dataStore)
     }
 }
 //endregion
 
 @Composable
 fun MainScreen(navController: NavController) {
+
     // Scaffold is a layout which implements the basic material design layout structure
     // With it we can add a top bar and a drawer for the options menu
 
@@ -149,8 +184,8 @@ fun MainScreen(navController: NavController) {
         topBar = {TopBar(scope, scaffoldState)},
         content = {MainScreenContent(navController = navController)},
         drawerContent = {Drawer(scope, context, dataStore)}
-
     )
+
 }
 
 //region --------- MAIN MENU CONTENT (buttons, etc..) ------------
@@ -159,7 +194,8 @@ fun MainScreenContent(navController: NavController){
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .fillMaxHeight(),
+            .fillMaxHeight()
+            .background(MaterialTheme.colors.background),
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
@@ -167,7 +203,7 @@ fun MainScreenContent(navController: NavController){
         Text(
             text = "Dating or related?",
             fontSize = 32.sp,
-            color = MaterialTheme.colors.primary,
+            color = MaterialTheme.colors.onBackground,
             modifier = Modifier.fillMaxWidth(),
             textAlign = TextAlign.Center
         )
@@ -175,12 +211,12 @@ fun MainScreenContent(navController: NavController){
             onClick = {
                 navController.navigate(Screen.GameScreen.route);
             },
-            colors = ButtonDefaults.buttonColors(backgroundColor = MaterialTheme.colors.background)
+            colors = ButtonDefaults.buttonColors(backgroundColor = MaterialTheme.colors.primary)
         ) {
             Text(
                 text = "Start Game!",
                 fontSize = 32.sp,
-                color = MaterialTheme.colors.primary,
+                color = MaterialTheme.colors.onPrimary,
                 modifier = Modifier.fillMaxWidth(),
                 textAlign = TextAlign.Center
             )
@@ -189,12 +225,12 @@ fun MainScreenContent(navController: NavController){
             onClick = {
                 navController.navigate(Screen.CreditsScreen.route);
             },
-            colors = ButtonDefaults.buttonColors(backgroundColor = MaterialTheme.colors.background)
+            colors = ButtonDefaults.buttonColors(backgroundColor = MaterialTheme.colors.primary)
         ) {
             Text(
                 text = "Credits",
                 fontSize = 32.sp,
-                color = MaterialTheme.colors.primary,
+                color = MaterialTheme.colors.onPrimary,
                 modifier = Modifier.fillMaxWidth(),
                 textAlign = TextAlign.Center
             )
