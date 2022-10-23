@@ -174,23 +174,17 @@ fun MainScreen(navController: NavController) {
     val context = LocalContext.current
     val dataStore = StoreUserSettings(context)
 
-
     val answerTimeString = dataStore.getQuestionTime.collectAsState(initial = "")
     if(answerTimeString.value!! != ""){
         answerTime = answerTimeString.value!!.toInt()
     }
 
-    preferredTheme = dataStore.getPreferredTheme.collectAsState(initial = "").value!!
-
-    DatingOrRelatedTheme(preferredTheme = preferredTheme, content = {
-        Scaffold(
-            scaffoldState = scaffoldState,
-            topBar = {TopBar(scope, scaffoldState)},
-            content = {MainScreenContent(navController = navController)},
-            drawerContent = {Drawer(scope, context, dataStore)}
-
-        )
-    })
+    Scaffold(
+        scaffoldState = scaffoldState,
+        topBar = {TopBar(scope, scaffoldState)},
+        content = {MainScreenContent(navController = navController)},
+        drawerContent = {Drawer(scope, context, dataStore)}
+    )
 
 }
 
