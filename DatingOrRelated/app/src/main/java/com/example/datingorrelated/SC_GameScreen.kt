@@ -5,10 +5,9 @@ import android.os.Looper
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
-import androidx.compose.material.Button
-import androidx.compose.material.ButtonDefaults
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Text
+import androidx.compose.material.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Menu
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
@@ -17,7 +16,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.ViewModel
@@ -66,7 +64,7 @@ fun GameScreen(navController: NavController) {
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        //timer()
+
         //print(sec)
         TopLevel()
         //handleTime(min, sec)
@@ -197,7 +195,9 @@ fun GameScreen(navController: NavController) {
         }
 
         TimerText(secondsToDisappear)
-
+        Column(modifier = Modifier.fillMaxWidth().fillMaxHeight()){
+            Timer()
+        }
     }
 
     // To manage the answer time
@@ -208,8 +208,12 @@ fun GameScreen(navController: NavController) {
                 secondsToDisappear -= 1
             }
             // time has passed and the user hasn't responded, go to next question
-            mCurrentPosition++
-            secondsToDisappear = answerTime
+            if(mCurrentPosition == maximum-1){
+                navController.navigate(Screen.EndGameScreen.createRoute(correct)) // go to end screen
+            }else{
+                mCurrentPosition++ // go to next question
+                secondsToDisappear = answerTime // restore time
+            }
         }
     }
 }
@@ -331,34 +335,41 @@ fun QuestionImage(image: Int) {
 //endregion
 
 //region Timer related methods
-@Preview
 @Composable
-fun timer() {
+fun Timer() {
     var seconds by remember {
         mutableStateOf(0)
     }
     var minutes by remember {
         mutableStateOf(0)
     }
-    Text(
-        text = "0 $minutes : $seconds",
-        fontSize = 40.sp,
-        color = MaterialTheme.colors.primary,
-        textAlign = TextAlign.Center
-    )
+
+    Row(modifier = Modifier.fillMaxWidth().fillMaxHeight()
+    ){
+        Icon(imageVector = Icons.Filled.Menu, // change this for a clock
+            contentDescription = "Menu icon",
+            tint = MaterialTheme.colors.primary
+        )
+        Text(
+            text = "0 $minutes : $seconds",
+            fontSize = 40.sp,
+            color = MaterialTheme.colors.primary,
+            textAlign = TextAlign.Center
+        )
+    }
 
     LaunchedEffect(key1 = seconds, key2 = minutes){
         delay(1000)
         if(seconds % 59 == 0 && seconds != 0){
             seconds = 0
-            minutes = minutes + 1
+            minutes++
         }
         else
-            seconds = seconds + 1
+            seconds++
     }
-    println(seconds)
 }
 
+//// are the following methods used for smthng ??
 
 class ViewModelTimer : ViewModel(){
     var totalMinutos by mutableStateOf(0)
