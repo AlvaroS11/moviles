@@ -25,35 +25,31 @@ import kotlin.time.Duration.Companion.seconds
 // GLOBAL VARIABLES
 data class Response(var _datingBtnColor: Int, var _relatedBtnColor: Int, var _bothBtnColor: Int, var _correct: Int)
 var mQuestionsList = Constants.getQuestions()
-var suffledQuestions = mQuestionsList.shuffled()
+var shuffledQuestions = mQuestionsList.shuffled()
 var testingSeconds = 0
 
 
 
 @Composable
 fun GameScreen(navController: NavController, mapName: String) {
-    println("loadingGameScreen " + "$mapName")
 
     //region --- Variables Region ---
 
     // To change the color of the buttons based on the answer
-    var primaryColor = MaterialTheme.colors.primary
+    val primaryColor = MaterialTheme.colors.primary
     var datingBtnColor by rememberSaveable { mutableStateOf(primaryColor.toArgb()) }
     var relatedBtnColor by rememberSaveable { mutableStateOf(primaryColor.toArgb()) }
     var bothBtnColor by rememberSaveable { mutableStateOf(primaryColor.toArgb()) }
 
     // To manage the questions
     var mCurrentPosition by rememberSaveable { mutableStateOf(0) }
-    val question = suffledQuestions!![mCurrentPosition]
+    val question = shuffledQuestions[mCurrentPosition]
     val maximum = mQuestionsList.size
     var canClick by rememberSaveable { mutableStateOf(true) }
     var correct by rememberSaveable { mutableStateOf(0) }
 
     // To manage the answer timer
     var secondsToDisappear by rememberSaveable { mutableStateOf(answerTime) }
-
-    //var min by rememberSaveable { mutableStateOf(0) }
-    var sec by rememberSaveable { mutableStateOf(0) }
 
     //endregion
 
@@ -65,10 +61,6 @@ fun GameScreen(navController: NavController, mapName: String) {
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-
-        //print(sec)
-        //TopLevel()
-        //handleTime(min, sec)
         CorrectAnswersText(number = correct)
         QuestionText(question.question)
         Row( // Images
@@ -90,7 +82,7 @@ fun GameScreen(navController: NavController, mapName: String) {
 
                     val(_datingBtnColor, _relatedBtnColor, _bothBtnColor, _correct) = handleResponse("Dating", question, correct)
 
-                    // reasign colors based on answer
+                    // reassign colors based on answer
                     datingBtnColor = _datingBtnColor
                     relatedBtnColor = _relatedBtnColor
                     bothBtnColor = _bothBtnColor
@@ -106,7 +98,6 @@ fun GameScreen(navController: NavController, mapName: String) {
 
                         if(mCurrentPosition == maximum-1){
                             navController.navigate(Screen.EndGameScreen.createRoute(correct, mapName, testingSeconds))
-                            println("Dating " + correct)
 // go to end screen
                         }else{
                             mCurrentPosition++ // go to next question
@@ -131,7 +122,7 @@ fun GameScreen(navController: NavController, mapName: String) {
 
                     val(_datingBtnColor, _relatedBtnColor, _bothBtnColor, _correct) = handleResponse("Related", question, correct)
 
-                    // reasign colors based on answer
+                    // reassign colors based on answer
                     datingBtnColor = _datingBtnColor
                     relatedBtnColor = _relatedBtnColor
                     bothBtnColor = _bothBtnColor
@@ -147,7 +138,6 @@ fun GameScreen(navController: NavController, mapName: String) {
 
                         if(mCurrentPosition == maximum-1){
                             navController.navigate(Screen.EndGameScreen.createRoute(correct, mapName, testingSeconds)) // go to end screen
-                            println("Related " + correct)
 
                         }else{
                             mCurrentPosition++ // go to next question
@@ -172,7 +162,7 @@ fun GameScreen(navController: NavController, mapName: String) {
 
                     val(_datingBtnColor, _relatedBtnColor, _bothBtnColor, _correct) = handleResponse("Both", question, correct)
 
-                    // reasign colors based on answer
+                    // reassign colors based on answer
                     datingBtnColor = _datingBtnColor
                     relatedBtnColor = _relatedBtnColor
                     bothBtnColor = _bothBtnColor
@@ -188,7 +178,6 @@ fun GameScreen(navController: NavController, mapName: String) {
 
                         if(mCurrentPosition == maximum-1){
                             navController.navigate(Screen.EndGameScreen.createRoute(correct, mapName, testingSeconds)) // go to end screen
-                            println("Both " + correct)
 
                         }else{
                             mCurrentPosition++ // go to next question
@@ -201,11 +190,10 @@ fun GameScreen(navController: NavController, mapName: String) {
             ButtonText("Both")
         }
 
-        TimerText(secondsToDisappear)
-        Column(modifier = Modifier
-            .fillMaxWidth()
-            .fillMaxHeight()){
-            Timer()
+        TimerText(secondsToDisappear) // timer of questions
+
+        Row{
+            Timer() // game timer
         }
     }
 
@@ -219,7 +207,6 @@ fun GameScreen(navController: NavController, mapName: String) {
             // time has passed and the user hasn't responded, go to next question
             if(mCurrentPosition == maximum-1){
                 navController.navigate(Screen.EndGameScreen.createRoute(correct, mapName, testingSeconds)) // go to end screen
-                println("Time " + correct)
             }else{
                 mCurrentPosition++ // go to next question
                 secondsToDisappear = answerTime // restore time
@@ -237,7 +224,7 @@ fun handleResponse(button: String, question: Question, correct: Int): Response{
 
     println("printing test")
     when(button){
-        "Dating" -> when(question!!.answer){
+        "Dating" -> when(question.answer){
             "Dating" -> {
                 _datingBtnColor = Color.Green.toArgb()
                 _correct++
@@ -252,7 +239,7 @@ fun handleResponse(button: String, question: Question, correct: Int): Response{
 
             }
         }
-        "Both" -> when(question!!.answer){
+        "Both" -> when(question.answer){
             "Dating" -> {
                 _bothBtnColor = Color.Red.toArgb()
                 _datingBtnColor = Color.Green.toArgb()
@@ -266,7 +253,7 @@ fun handleResponse(button: String, question: Question, correct: Int): Response{
                 _relatedBtnColor = Color.Green.toArgb()
             }
         }
-        "Related" -> when(question!!.answer){
+        "Related" -> when(question.answer){
             "Dating" -> {
                 _datingBtnColor = Color.Green.toArgb()
                 _relatedBtnColor = Color.Red.toArgb()
@@ -287,13 +274,13 @@ fun handleResponse(button: String, question: Question, correct: Int): Response{
 
 @Composable
 fun TimerText(number: Int){
-    var color = MaterialTheme.colors.primary
+    var color = MaterialTheme.colors.onBackground
     if (number == 0){
         color = Color.Red
     }
 
     Text(
-        text = "TimeLeft: $number",
+        text = "Question time left: $number",
         fontSize = 24.sp,
         color = color,
         textAlign = TextAlign.Center
@@ -305,7 +292,7 @@ fun CorrectAnswersText(number: Int){
     Text(
         text = "Correct answers: $number",
         fontSize = 24.sp,
-        color = MaterialTheme.colors.primary,
+        color = MaterialTheme.colors.onBackground,
         textAlign = TextAlign.Center
     )
 }
@@ -313,7 +300,7 @@ fun CorrectAnswersText(number: Int){
 @Composable
 fun ButtonText(name: String) {
     Text(
-        text = "$name",
+        text = name,
         fontSize = 32.sp,
         color = MaterialTheme.colors.onPrimary,
         textAlign = TextAlign.Center
@@ -323,9 +310,9 @@ fun ButtonText(name: String) {
 @Composable
 fun QuestionText(question: String) {
     Text(
-        text = "$question",
+        text = question,
         fontSize = 32.sp,
-        color = MaterialTheme.colors.onPrimary,
+        color = MaterialTheme.colors.onBackground,
         modifier = Modifier.fillMaxWidth(),
         textAlign = TextAlign.Center
     )
@@ -337,14 +324,13 @@ fun QuestionImage(image: Int) {
         painter = painterResource(image),
         contentDescription = "Contact profile picture",
         modifier = Modifier
-            // Set image size to 40 dp
             .size(150.dp)
     )
 }
 
 //endregion
 
-//region Timer related methods
+//region Timer
 @Composable
 fun Timer() {
     var seconds by remember {
@@ -354,21 +340,12 @@ fun Timer() {
         mutableStateOf(0)
     }
 
-    Row(modifier = Modifier
-        .fillMaxWidth()
-        .fillMaxHeight()
-    ){
-        Icon(imageVector = Icons.Filled.Menu, // change this for a clock
-            contentDescription = "Menu icon",
-            tint = MaterialTheme.colors.primary
-        )
-        Text(
-            text = "0 $minutes : $seconds",
-            fontSize = 40.sp,
-            color = MaterialTheme.colors.primary,
-            textAlign = TextAlign.Center
-        )
-    }
+    Text(
+        text = "0 $minutes : $seconds",
+        fontSize = 40.sp,
+        color = MaterialTheme.colors.onBackground,
+        textAlign = TextAlign.Center
+    )
 
     LaunchedEffect(key1 = seconds, key2 = minutes){
         delay(1000)
@@ -382,135 +359,4 @@ fun Timer() {
     testingSeconds = seconds
 }
 
-/*
-//// are the following methods used for smthng ??
-
-class ViewModelTimer : ViewModel(){
-    var totalMinutos by mutableStateOf(0)
-    var totalSegundos by mutableStateOf(0)
-
-    @Composable
-    fun addingTime() {
-        LaunchedEffect(key1 = totalMinutos, key2 =  totalSegundos){
-            delay(1000)
-            if (totalMinutos % 59 == 0 && totalSegundos != 0) {
-                totalSegundos = 0
-                totalMinutos = totalMinutos + 1
-            } else
-                totalSegundos = totalSegundos + 1
-        }
-    }
-}
-
-@Composable
-fun TopLevel(model: ViewModelTimer = viewModel()){
-    //timerScreen(minutos = model.totalMinutos, segundos = model.totalSegundos){model.addingTime()}
-}
-
-
-@Composable
-fun timerScreen(minutos: Int, segundos: Int, addCount: () -> Unit = {}){
-    Text(
-        text = "0 $minutos : $segundos",
-        fontSize = 40.sp,
-        color = MaterialTheme.colors.primary,
-        textAlign = TextAlign.Center
-    )
-    addCount
-}
-
-@Composable
-fun introduceName(viewModel: GameViewModel) {
-    var gameName by remember { mutableStateOf("") }
-    var gameSecs by remember { mutableStateOf("") }
-    var searching by remember { mutableStateOf(false) }
-
-    val onProductTextChange = { text: String ->
-        gameName = text
-    }
-
-    val ongameSecsTextChange = { text: String ->
-        gameSecs = text
-    }
-
-
-    Column(
-        horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = Modifier
-            .fillMaxWidth()
-    ) {
-        CustomTextField(
-            title = "Player Name",
-            textState = gameName,
-            onTextChange = onProductTextChange,
-            keyboardType = KeyboardType.Text
-        )
-
-        Row(
-            horizontalArrangement = Arrangement.SpaceEvenly,
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(10.dp)
-        ) {
-            Button(onClick = {
-                if (gameSecs.isNotEmpty()) {
-                    viewModel.insertProduct(
-                        GameStats(
-                            gameName,
-                            gameSecs.toInt()
-                        )
-                    )
-                    searching = false
-                } else {
-                    println("JUST FOR DEBUG!!__SAVING WITHOUT SECONDS")
-                    viewModel.insertProduct(
-                        GameStats(
-                            gameName,
-                            0
-                        )
-                    )
-                    searching = false
-                }
-            }) {
-                Text("Add")
-            }
-
-
-        }
-    }
-}
-
-
-
-/*
-@Preview
-@Composable
-fun timer() {
-    var seconds by remember {
-        mutableStateOf(0)
-    }
-    var minutes by remember {
-        mutableStateOf(0)
-    }
-    Text(
-        text = "0 $minutes : $testingSeconds",
-        fontSize = 40.sp,
-        color = MaterialTheme.colors.primary,
-        textAlign = TextAlign.Center
-    )
-
-    LaunchedEffect(key1 = testingSeconds, key2 = minutes){
-        delay(1000)
-        if(testingSeconds % 59 == 0 && testingSeconds != 0){
-            testingSeconds = 0
-            minutes = minutes + 1
-        }
-        else
-            testingSeconds = testingSeconds + 1
-    }
-    println(testingSeconds)
-}*/
-
 //endregion
-
- */

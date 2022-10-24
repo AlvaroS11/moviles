@@ -1,14 +1,16 @@
 package com.example.datingorrelated
 
 import android.app.Activity
-import android.content.Context
 import android.media.MediaPlayer
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -22,6 +24,7 @@ import kotlinx.coroutines.launch
 // GLOBAL VARIABLES
 var preferredTheme = "" // by default it will be the system theme, otherwise it can be "Dark" or "Light"
 var answerTime = 20
+var volume = 1f
 
 //region ---------- OPTIONS MENU REGION ----------
 @Composable
@@ -44,9 +47,18 @@ fun TopBar(scope: CoroutineScope, scaffoldState: ScaffoldState){
 }
 
 @Composable
-fun RadioButtonTimeDifficulty(scope: CoroutineScope, context: Context, dataStore: StoreUserSettings) {
+fun RadioButtonTimeDifficulty(scope: CoroutineScope, dataStore: StoreUserSettings) {
     val radioOptions = listOf("Easy: 20 seconds", "Normal: 10 seconds", "Difficult: 5 seconds")
-    val (selectedOption, onOptionSelected) = remember { mutableStateOf(radioOptions.first()) }
+
+    val optionNumber: Int = if(answerTime == 20){
+        0
+    } else{
+        if (answerTime == 10) {
+            1
+        } else 2
+    }
+
+    val (selectedOption, onOptionSelected) = remember { mutableStateOf(radioOptions[optionNumber]) }
     Column (modifier = Modifier
         .fillMaxWidth()
         .padding(top = 16.dp),
@@ -88,11 +100,19 @@ fun RadioButtonTimeDifficulty(scope: CoroutineScope, context: Context, dataStore
     }
 }
 
-
 @Composable
-fun RadioButtonHandleTheme(scope: CoroutineScope, context: Context, dataStore: StoreUserSettings) {
+fun RadioButtonHandleTheme(scope: CoroutineScope, dataStore: StoreUserSettings) {
     val radioOptions = listOf("Dark", "Light", "Same as system")
-    val (selectedOption, onOptionSelected) = remember { mutableStateOf(radioOptions.first()) }
+
+    val optionNumber: Int = if(preferredTheme == "Dark"){
+        0
+    } else{
+        if (preferredTheme == "Light") {
+            1
+        } else 2
+    }
+
+    val (selectedOption, onOptionSelected) = remember { mutableStateOf(radioOptions[optionNumber]) }
     Column (modifier = Modifier
         .fillMaxWidth()
         .padding(top = 16.dp),
@@ -109,19 +129,19 @@ fun RadioButtonHandleTheme(scope: CoroutineScope, context: Context, dataStore: S
                     onClick = {
                         onOptionSelected(text)
                         when (text){
-                            radioOptions[0] -> { // easy
+                            radioOptions[0] -> { // dark
                                 preferredTheme = text
                             }
-                            radioOptions[1] -> { // normal
+                            radioOptions[1] -> { // light
                                 preferredTheme = text
                             }
-                            radioOptions[2] -> { // difficult
+                            radioOptions[2] -> { //
                                 preferredTheme = text
                             }
                         }
                         // store the answer time on device
                         scope.launch{
-                            dataStore.savePreferredTheme(preferredTheme.toString())
+                            dataStore.savePreferredTheme(preferredTheme)
                         }
                     }
                 )
@@ -135,22 +155,42 @@ fun RadioButtonHandleTheme(scope: CoroutineScope, context: Context, dataStore: S
 }
 
 @Composable
-fun HandleVolume(mediaPlayer: MediaPlayer){
-    var sliderPosition by remember { mutableStateOf(1f) }
-    Text(text = (sliderPosition*100).toInt().toString())
+fun HandleVolume(scope: CoroutineScope, dataStore: StoreUserSettings){
+
+    var sliderPosition by rememberSaveable { mutableStateOf(volume) }
+
+    Text(
+        modifier = Modifier.padding(horizontal = 16.dp),
+        text = "Volume: "+ (sliderPosition*100).toInt().toString()
+    )
+
     Slider(value = sliderPosition,
         valueRange = 0f..1f,
         modifier = Modifier.padding(horizontal = 16.dp),
-        onValueChange = {sliderPosition = it})
-    mediaPlayer.setVolume(sliderPosition, sliderPosition)
+        onValueChange = {
+            sliderPosition = it
+            volume = sliderPosition
+            scope.launch{
+                dataStore.saveVolume(volume.toString())
+            }
+        })
 }
 
 @Composable
-fun Drawer(scope: CoroutineScope, context: Context, dataStore: StoreUserSettings){
-    Column (modifier = Modifier.background(MaterialTheme.colors.background).fillMaxHeight()) {
-        //HandleVolume()
-        RadioButtonHandleTheme(scope, context, dataStore)
-        RadioButtonTimeDifficulty(scope, context, dataStore)
+fun Drawer(scope: CoroutineScope, dataStore: StoreUserSettings){
+    LazyColumn (modifier = Modifier
+        .background(MaterialTheme.colors.background)
+        .fillMaxHeight()) {
+        item{
+            Text(modifier = Modifier.padding(horizontal = 16.dp),
+                text = "Settings",
+                fontSize = 30.sp,
+                color = MaterialTheme.colors.onBackground
+                )
+            HandleVolume(scope, dataStore)
+            RadioButtonHandleTheme(scope, dataStore)
+            RadioButtonTimeDifficulty(scope, dataStore)
+        }
     }
 }
 //endregion
@@ -166,16 +206,11 @@ fun MainScreen(navController: NavController) {
     val context = LocalContext.current
     val dataStore = StoreUserSettings(context)
 
-    val answerTimeString = dataStore.getQuestionTime.collectAsState(initial = "")
-    if(answerTimeString.value!! != ""){
-        answerTime = answerTimeString.value!!.toInt()
-    }
-
     Scaffold(
         scaffoldState = scaffoldState,
         topBar = {TopBar(scope, scaffoldState)},
         content = {MainScreenContent(navController = navController)},
-        drawerContent = {Drawer(scope, context, dataStore)}
+        drawerContent = {Drawer(scope, dataStore)}
     )
 
 }
@@ -191,7 +226,6 @@ fun MainScreenContent(navController: NavController){
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Text(text = "Time: "+ answerTime)
         Text(
             text = "Dating or related?",
             fontSize = 32.sp,
@@ -201,7 +235,7 @@ fun MainScreenContent(navController: NavController){
         )
         Button(
             onClick = {
-                navController.navigate(Screen.IntroName.route);
+                navController.navigate(Screen.IntroName.route)
             },
             colors = ButtonDefaults.buttonColors(backgroundColor = MaterialTheme.colors.primary)
         ) {
@@ -215,7 +249,7 @@ fun MainScreenContent(navController: NavController){
         }
         Button(
             onClick = {
-                navController.navigate(Screen.CreditsScreen.route);
+                navController.navigate(Screen.CreditsScreen.route)
             },
             colors = ButtonDefaults.buttonColors(backgroundColor = MaterialTheme.colors.primary)
         ) {
@@ -228,10 +262,9 @@ fun MainScreenContent(navController: NavController){
             )
         }
 
-
         Button(
             onClick = {
-                navController.navigate(Screen.RankingScreen.route);
+                navController.navigate(Screen.RankingScreen.route)
             },
             colors = ButtonDefaults.buttonColors(backgroundColor = MaterialTheme.colors.background)
         ) {

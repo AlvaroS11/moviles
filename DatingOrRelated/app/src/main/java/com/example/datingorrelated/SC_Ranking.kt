@@ -1,7 +1,6 @@
 package com.example.datingorrelated
 
 import android.app.Application
-import android.os.Bundle
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -23,7 +22,6 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewmodel.compose.LocalViewModelStoreOwner
-import androidx.lifecycle.viewmodel.compose.LocalViewModelStoreOwner.current
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 
@@ -73,11 +71,6 @@ fun Ranking(allGames: List<GameStats>, searchResults: List<GameStats>, viewModel
         gameName = text
     }
 
-    val ongameSecsTextChange = { text: String ->
-        gameSecs = text
-    }
-
-
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = Modifier
@@ -89,14 +82,6 @@ fun Ranking(allGames: List<GameStats>, searchResults: List<GameStats>, viewModel
             onTextChange = onProductTextChange,
             keyboardType = KeyboardType.Text
         )
-
-        /*CustomTextField(
-            title = "Score",
-            textState = gameSecs,
-            onTextChange = ongameSecsTextChange,
-            keyboardType = KeyboardType.Number
-        )
-*/
         Row(
             horizontalArrangement = Arrangement.SpaceEvenly,
             modifier = Modifier
@@ -174,8 +159,8 @@ fun Ranking(allGames: List<GameStats>, searchResults: List<GameStats>, viewModel
         }
     }
     Button(
-        onClick = {//CAMBIAR ESTO PARA HACER QUE VUELVA A DONDE ESTABA
-            navController.navigate(Screen.MainScreen.route);
+        onClick = {
+            navController.navigate(Screen.MainScreen.route)
         },
         colors = ButtonDefaults.buttonColors(backgroundColor = MaterialTheme.colors.background)
     ) {

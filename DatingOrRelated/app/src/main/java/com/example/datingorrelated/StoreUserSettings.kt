@@ -15,6 +15,7 @@ class StoreUserSettings (private val context: Context) {
         private val Context.dataStore: DataStore<Preferences> by preferencesDataStore("SettingsPreferences")
         val QUESTION_TIME_KEY = stringPreferencesKey("questionTime")
         val THEME_KEY = stringPreferencesKey("preferredTheme")
+        val VOLUME_KEY = stringPreferencesKey("volume")
     }
 
 
@@ -37,6 +38,17 @@ class StoreUserSettings (private val context: Context) {
     suspend fun savePreferredTheme(preferredTheme: String){
         context.dataStore.edit { preferences ->
             preferences[THEME_KEY] = preferredTheme
+        }
+    }
+
+    val getVolume: Flow<String> = context.dataStore.data
+        .map{ preferences ->
+            preferences[VOLUME_KEY] ?: ""
+        }
+
+    suspend fun saveVolume(volume: String){
+        context.dataStore.edit { preferences ->
+            preferences[VOLUME_KEY] = volume
         }
     }
 }

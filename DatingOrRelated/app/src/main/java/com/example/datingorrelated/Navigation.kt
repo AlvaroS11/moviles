@@ -7,21 +7,18 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
-import com.example.datingorrelated.ui.theme.SelectName
 
 @Composable
 fun Navigation(){
-    val navController = rememberNavController();
-    NavHost(navController = navController, startDestination = Screen.MainScreen.route){
-        composable(route = Screen.MainScreen.route){
-            MainScreen(navController = navController) //Asignamos la función a la ruta
+    val navController = rememberNavController()
+    NavHost(navController = navController, startDestination = Screen.LoadingScreen.route){
+        composable(route = Screen.LoadingScreen.route){
+            LoadingScreen(navController = navController)
         }
-       /* composable(route = Screen.GameScreen.route){
-            //GameScreen(navController = navController)
-            SelectName(navController = navController)
 
+        composable(route = Screen.MainScreen.route){
+            MainScreen(navController = navController)
         }
-        */
 
         composable(route =  Screen.IntroName.route){
             SelectName(navController = navController)
@@ -60,8 +57,6 @@ fun Navigation(){
             arguments = listOf(
                 navArgument("name"){
                 type = NavType.StringType
-                //defaultValue = "Empty Name"
-                //nullable = false
             })
         ){   entry ->
                 GameScreen(navController = navController, mapName = entry.arguments!!.getString("name").toString())
