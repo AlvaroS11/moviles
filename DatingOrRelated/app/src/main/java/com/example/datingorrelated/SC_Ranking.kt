@@ -91,7 +91,7 @@ fun Ranking(allGames: List<GameStats>, searchResults: List<GameStats>, viewModel
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(10.dp)
-        ) {
+        ) {/*
             Button(onClick = {
                 if (gameSecs.isNotEmpty()) {
                     viewModel.insertProduct(
@@ -116,7 +116,7 @@ fun Ranking(allGames: List<GameStats>, searchResults: List<GameStats>, viewModel
                 }
             }) {
                 Text("Add")
-            }
+            }*/
 
             Button(onClick = {
                 searching = true
