@@ -10,6 +10,7 @@ import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.Alignment.Companion.CenterVertically
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
@@ -72,9 +73,12 @@ fun Ranking(allGames: List<GameStats>, searchResults: List<GameStats>, viewModel
     }
 
     Column(
-        horizontalAlignment = Alignment.CenterHorizontally,
         modifier = Modifier
             .fillMaxWidth()
+            .fillMaxHeight()
+            .background(MaterialTheme.colors.background),
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         CustomTextField(
             title = "Player Name",
@@ -143,6 +147,7 @@ fun Ranking(allGames: List<GameStats>, searchResults: List<GameStats>, viewModel
             Modifier
                 .fillMaxWidth()
                 .padding(10.dp)
+                .background(MaterialTheme.colors.secondary)
         ) {
             val list = if (searching) searchResults else allGames
 
@@ -157,21 +162,22 @@ fun Ranking(allGames: List<GameStats>, searchResults: List<GameStats>, viewModel
                 )
             }
         }
+        Button(
+            onClick = {
+                navController.navigate(Screen.MainScreen.route)
+            },
+            colors = ButtonDefaults.buttonColors(backgroundColor = MaterialTheme.colors.primary)
+        ) {
+            Text(
+                text = "Back To Menu",
+                fontSize = 32.sp,
+                color = MaterialTheme.colors.background,
+                modifier = Modifier.width(250.dp),
+                textAlign = TextAlign.Center
+            )
+        }
     }
-    Button(
-        onClick = {
-            navController.navigate(Screen.MainScreen.route)
-        },
-        colors = ButtonDefaults.buttonColors(backgroundColor = MaterialTheme.colors.background)
-    ) {
-        Text(
-            text = "Back To Menu",
-            fontSize = 32.sp,
-            color = MaterialTheme.colors.primary,
-            modifier = Modifier.fillMaxWidth(),
-            textAlign = TextAlign.Center
-        )
-    }
+
 
 }
 

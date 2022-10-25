@@ -4,8 +4,10 @@ import android.app.Activity
 import android.media.MediaPlayer
 import android.util.Log
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Settings
@@ -13,6 +15,7 @@ import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -30,7 +33,7 @@ var volume = 1f
 @Composable
 fun TopBar(scope: CoroutineScope, scaffoldState: ScaffoldState){
     TopAppBar (
-        //modifier = Modifier.background(MaterialTheme.colors.primary),
+        modifier = Modifier.background(MaterialTheme.colors.primary),
         title = {Text(text = "Dating or Related",
             color = MaterialTheme.colors.onPrimary)},
         navigationIcon = {
@@ -233,6 +236,7 @@ fun MainScreenContent(navController: NavController){
             modifier = Modifier.fillMaxWidth(),
             textAlign = TextAlign.Center
         )
+        Spacer(modifier = Modifier.size(10.dp))
         Button(
             onClick = {
                 navController.navigate(Screen.IntroName.route)
@@ -243,39 +247,42 @@ fun MainScreenContent(navController: NavController){
                 text = "Start Game!",
                 fontSize = 32.sp,
                 color = MaterialTheme.colors.onPrimary,
-                modifier = Modifier.fillMaxWidth(),
                 textAlign = TextAlign.Center
             )
+
         }
+        Spacer(modifier = Modifier.size(10.dp))
         Button(
             onClick = {
                 navController.navigate(Screen.CreditsScreen.route)
             },
-            colors = ButtonDefaults.buttonColors(backgroundColor = MaterialTheme.colors.primary)
+            colors = ButtonDefaults.buttonColors(backgroundColor = MaterialTheme.colors.secondary)
         ) {
             Text(
                 text = "Credits",
                 fontSize = 32.sp,
                 color = MaterialTheme.colors.onPrimary,
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier.width(150.dp),
                 textAlign = TextAlign.Center
             )
         }
+        Spacer(modifier = Modifier.size(10.dp))
 
         Button(
             onClick = {
                 navController.navigate(Screen.RankingScreen.route)
             },
-            colors = ButtonDefaults.buttonColors(backgroundColor = MaterialTheme.colors.background)
+            colors = ButtonDefaults.buttonColors(backgroundColor = MaterialTheme.colors.secondary)
         ) {
             Text(
                 text = "Ranking",
                 fontSize = 32.sp,
-                color = MaterialTheme.colors.primary,
-                modifier = Modifier.fillMaxWidth(),
+                color = MaterialTheme.colors.onPrimary,
+                modifier = Modifier.width(150.dp),
                 textAlign = TextAlign.Center
             )
         }
+        Spacer(modifier = Modifier.size(10.dp))
 
         val activity = (LocalContext.current as? Activity)
 
@@ -283,12 +290,13 @@ fun MainScreenContent(navController: NavController){
             onClick = {
                 activity?.finish()
             },
+            colors = ButtonDefaults.buttonColors(backgroundColor = MaterialTheme.colors.onPrimary)
         ) {
             Text(
                 text = "Exit",
                 fontSize = 24.sp,
-                color = MaterialTheme.colors.secondary,
-                modifier = Modifier.fillMaxWidth(),
+                color = MaterialTheme.colors.error,
+                modifier = Modifier.width(100.dp),
                 textAlign = TextAlign.Center
             )
         }

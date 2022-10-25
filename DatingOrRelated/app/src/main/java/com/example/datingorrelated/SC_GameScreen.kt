@@ -4,7 +4,9 @@ import android.os.Handler
 import android.os.Looper
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Menu
@@ -12,6 +14,7 @@ import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.res.painterResource
@@ -68,8 +71,10 @@ fun GameScreen(navController: NavController, mapName: String) {
             horizontalArrangement = Arrangement.Center
         ) {
             QuestionImage(question.firstImage)
+            Spacer(modifier = Modifier.width(10.dp))
             QuestionImage(question.secondImage)
         }
+        Spacer(modifier = Modifier.size(10.dp))
         // Dating button
         Button(
             onClick = {
@@ -110,6 +115,7 @@ fun GameScreen(navController: NavController, mapName: String) {
         ) {
             ButtonText("Dating")
         }
+        Spacer(modifier = Modifier.size(10.dp))
         // Related button
         Button(
             onClick = {
@@ -150,6 +156,7 @@ fun GameScreen(navController: NavController, mapName: String) {
         ) {
             ButtonText("Related")
         }
+        Spacer(modifier = Modifier.size(10.dp))
         // Both button
         Button(
             onClick = {
@@ -191,7 +198,7 @@ fun GameScreen(navController: NavController, mapName: String) {
         }
 
         TimerText(secondsToDisappear) // timer of questions
-
+        Spacer(modifier = Modifier.size(10.dp))
         Row{
             Timer() // game timer
         }
@@ -227,14 +234,18 @@ fun handleResponse(button: String, question: Question, correct: Int): Response{
         "Dating" -> when(question.answer){
             "Dating" -> {
                 _datingBtnColor = Color.Green.toArgb()
+                _bothBtnColor = Color.Gray.toArgb()
+                _relatedBtnColor = Color.Gray.toArgb()
                 _correct++
             }
             "Both" -> {
-                _bothBtnColor = Color.Green.toArgb()
+                _bothBtnColor = Color.Gray.toArgb()
+                _relatedBtnColor = Color.Gray.toArgb()
                 _datingBtnColor = Color.Red.toArgb()
             }
             "Related" -> {
-                _relatedBtnColor = Color.Green.toArgb()
+                _relatedBtnColor = Color.Gray.toArgb()
+                _bothBtnColor = Color.Gray.toArgb()
                 _datingBtnColor = Color.Red.toArgb()
 
             }
@@ -242,28 +253,36 @@ fun handleResponse(button: String, question: Question, correct: Int): Response{
         "Both" -> when(question.answer){
             "Dating" -> {
                 _bothBtnColor = Color.Red.toArgb()
-                _datingBtnColor = Color.Green.toArgb()
+                _datingBtnColor = Color.Gray.toArgb()
+                _relatedBtnColor = Color.Gray.toArgb()
             }
             "Both" -> {
                 _bothBtnColor = Color.Green.toArgb()
+                _datingBtnColor = Color.Gray.toArgb()
+                _relatedBtnColor = Color.Gray.toArgb()
                 _correct++
             }
             "Related" -> {
                 _bothBtnColor = Color.Red.toArgb()
-                _relatedBtnColor = Color.Green.toArgb()
+                _relatedBtnColor = Color.Gray.toArgb()
+                _datingBtnColor = Color.Gray.toArgb()
             }
         }
         "Related" -> when(question.answer){
             "Dating" -> {
-                _datingBtnColor = Color.Green.toArgb()
+                _datingBtnColor = Color.Gray.toArgb()
+                _bothBtnColor = Color.Gray.toArgb()
                 _relatedBtnColor = Color.Red.toArgb()
             }
             "Both" -> {
-                _bothBtnColor = Color.Green.toArgb()
+                _bothBtnColor = Color.Gray.toArgb()
+                _datingBtnColor = Color.Gray.toArgb()
                 _relatedBtnColor = Color.Red.toArgb()
             }
             "Related" -> {
                 _relatedBtnColor = Color.Green.toArgb()
+                _bothBtnColor = Color.Gray.toArgb()
+                _datingBtnColor = Color.Gray.toArgb()
                 _correct++
             }
         }
@@ -303,6 +322,7 @@ fun ButtonText(name: String) {
         text = name,
         fontSize = 32.sp,
         color = MaterialTheme.colors.onPrimary,
+        modifier = Modifier.width(150.dp),
         textAlign = TextAlign.Center
     )
 }
@@ -313,7 +333,6 @@ fun QuestionText(question: String) {
         text = question,
         fontSize = 32.sp,
         color = MaterialTheme.colors.onBackground,
-        modifier = Modifier.fillMaxWidth(),
         textAlign = TextAlign.Center
     )
 }
@@ -324,7 +343,7 @@ fun QuestionImage(image: Int) {
         painter = painterResource(image),
         contentDescription = "Contact profile picture",
         modifier = Modifier
-            .size(150.dp)
+            .size(150.dp).clip(CircleShape).border(10.dp, MaterialTheme.colors.secondary, CircleShape)
     )
 }
 

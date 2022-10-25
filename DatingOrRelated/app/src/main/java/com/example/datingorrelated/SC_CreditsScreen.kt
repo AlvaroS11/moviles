@@ -1,10 +1,8 @@
 package com.example.datingorrelated
 
 
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.*
 import androidx.compose.material.Button
 import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.MaterialTheme
@@ -13,6 +11,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
 import androidx.navigation.NavController
@@ -22,9 +21,10 @@ fun Credits(navController: NavController){
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .fillMaxHeight(),
+            .fillMaxHeight()
+            .background(MaterialTheme.colors.background),
         verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally
+        horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         Text(
             text = "Credits :)",
@@ -51,13 +51,13 @@ fun Credits(navController: NavController){
             onClick = {//CAMBIAR ESTO PARA HACER QUE VUELVA A DONDE ESTABA
                 navController.navigate(Screen.MainScreen.route);
             },
-            colors = ButtonDefaults.buttonColors(backgroundColor = MaterialTheme.colors.background)
+            colors = ButtonDefaults.buttonColors(backgroundColor = MaterialTheme.colors.primary)
         ) {
             Text(
                 text = "Back",
                 fontSize = 32.sp,
-                color = MaterialTheme.colors.primary,
-                modifier = Modifier.fillMaxWidth(),
+                color = MaterialTheme.colors.background,
+                modifier = Modifier.width(150.dp),
                 textAlign = TextAlign.Center
             )
         }
