@@ -83,8 +83,6 @@ fun GameScreen(navController: NavController, mapName: String) {
 
                     secondsToDisappear = answerTime // the user has answered, rewind timer
 
-                    print(testingSeconds)
-
                     val(_datingBtnColor, _relatedBtnColor, _bothBtnColor, _correct) = handleResponse("Dating", question, correct)
 
                     // reassign colors based on answer
@@ -123,9 +121,6 @@ fun GameScreen(navController: NavController, mapName: String) {
                     canClick = false // it has just clicked, so it can't click again
 
                     secondsToDisappear = answerTime // the user has answered, rewind timer
-
-                    print(testingSeconds)
-
                     val(_datingBtnColor, _relatedBtnColor, _bothBtnColor, _correct) = handleResponse("Related", question, correct)
 
                     // reassign colors based on answer
@@ -164,8 +159,6 @@ fun GameScreen(navController: NavController, mapName: String) {
                     canClick = false // it has just clicked, so it can't click again
 
                     secondsToDisappear = answerTime // the user has answered, rewind timer
-
-                    print(testingSeconds)
 
                     val(_datingBtnColor, _relatedBtnColor, _bothBtnColor, _correct) = handleResponse("Both", question, correct)
 
@@ -229,7 +222,6 @@ fun handleResponse(button: String, question: Question, correct: Int): Response{
     var _relatedBtnColor = 0
     var _correct = correct
 
-    println("printing test")
     when(button){
         "Dating" -> when(question.answer){
             "Dating" -> {

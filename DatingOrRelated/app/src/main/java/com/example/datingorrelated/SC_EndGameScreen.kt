@@ -19,7 +19,6 @@ import androidx.navigation.NavController
 
 @Composable
 fun EndGameScreen(navController: NavController, name: String,time: Int, correct: Int) {
-    println("CORRECT ANSWERS: " + correct)
     save(name = name, time = time, score = correct)
     Column(
         modifier = Modifier
@@ -30,7 +29,7 @@ fun EndGameScreen(navController: NavController, name: String,time: Int, correct:
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Text(
-            text = "Fin de la partida!",
+            text = "End of the game!",
             fontSize = 32.sp,
             color = MaterialTheme.colors.primary,
             modifier = Modifier.fillMaxWidth(),
@@ -38,21 +37,21 @@ fun EndGameScreen(navController: NavController, name: String,time: Int, correct:
         )
         Spacer(modifier = Modifier.size(10.dp))
         Text(
-            text = "Estos son tus resultados $name :",
+            text = "This are your answers $name :",
             fontSize = 24.sp,
             color = MaterialTheme.colors.secondary,
             modifier = Modifier.fillMaxWidth(),
             textAlign = TextAlign.Center
         )
         Text(
-            text = "$correct aciertos",
+            text = "$correct correct answers",
             fontSize = 24.sp,
             color = MaterialTheme.colors.secondary,
             modifier = Modifier.fillMaxWidth(),
             textAlign = TextAlign.Center
         )
         Text(
-            text = "en $time segundos",
+            text = "in $time seconds",
             fontSize = 24.sp,
             color = MaterialTheme.colors.secondary,
             modifier = Modifier.fillMaxWidth(),
@@ -61,13 +60,12 @@ fun EndGameScreen(navController: NavController, name: String,time: Int, correct:
         Spacer(modifier = Modifier.size(10.dp))
         Button(
             onClick = {
-//                save(name = name, time = time)
                 navController.navigate(Screen.MainScreen.route);
             },
             colors = ButtonDefaults.buttonColors(backgroundColor = MaterialTheme.colors.primary)
         ) {
             Text(
-                text = "Volver a inicio",
+                text = "Back to home",
                 fontSize = 32.sp,
                 color = MaterialTheme.colors.background,
                 modifier = Modifier.width(250.dp),

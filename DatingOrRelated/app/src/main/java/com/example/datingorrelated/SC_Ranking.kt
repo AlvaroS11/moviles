@@ -77,7 +77,7 @@ fun Ranking(allGames: List<GameStats>, searchResults: List<GameStats>, viewModel
             .fillMaxWidth()
             .fillMaxHeight()
             .background(MaterialTheme.colors.background),
-        verticalArrangement = Arrangement.Center,
+        verticalArrangement = Arrangement.Top,
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         CustomTextField(
@@ -90,34 +90,8 @@ fun Ranking(allGames: List<GameStats>, searchResults: List<GameStats>, viewModel
             horizontalArrangement = Arrangement.SpaceEvenly,
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(10.dp)
-        ) {/*
-            Button(onClick = {
-                if (gameSecs.isNotEmpty()) {
-                    viewModel.insertProduct(
-                        GameStats(
-                            gameName,
-                            gameSecs.toInt(),
-                            scorePoints.toInt()
-                        )
-                    )
-                    searching = false
-                }
-                else{
-                    println("JUST FOR DEBUG!!__SAVING WITHOUT SECONDS")
-                    viewModel.insertProduct(
-                        GameStats(
-                            gameName,
-                            0,
-                            0
-                        )
-                    )
-                    searching = false
-                }
-            }) {
-                Text("Add")
-            }*/
-
+                .padding(1.dp)
+        ) {
             Button(onClick = {
                 searching = true
                 viewModel.findProduct(gameName)
@@ -140,8 +114,6 @@ fun Ranking(allGames: List<GameStats>, searchResults: List<GameStats>, viewModel
                 Text("Clear")
             }
         }
-
-
 
         LazyColumn(
             Modifier
@@ -166,15 +138,16 @@ fun Ranking(allGames: List<GameStats>, searchResults: List<GameStats>, viewModel
             onClick = {
                 navController.navigate(Screen.MainScreen.route)
             },
-            colors = ButtonDefaults.buttonColors(backgroundColor = MaterialTheme.colors.primary)
+            colors = ButtonDefaults.buttonColors(backgroundColor = MaterialTheme.colors.primary),
         ) {
             Text(
                 text = "Back To Menu",
                 fontSize = 32.sp,
                 color = MaterialTheme.colors.background,
                 modifier = Modifier.width(250.dp),
-                textAlign = TextAlign.Center
-            )
+                textAlign = TextAlign.Center,
+
+                )
         }
     }
 
