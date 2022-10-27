@@ -207,7 +207,7 @@ fun CustomTextField(
         label = { Text(title) },
         modifier = Modifier.padding(10.dp),
         textStyle = TextStyle(fontWeight = FontWeight.Bold,
-            fontSize = 30.sp)
+            fontSize = 30.sp, color = MaterialTheme.colors.onBackground)
     )
 }
 

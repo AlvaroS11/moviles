@@ -2,19 +2,33 @@ package com.example.datingorrelated
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
-import androidx.compose.material.Button
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Text
+import androidx.compose.material.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import kotlinx.coroutines.launch
 
-    @Composable
+@Composable
     fun SelectName(navController: NavController) {
+        Column(){
+            Row(modifier = Modifier.background(MaterialTheme.colors.background)){
+                IconButton(onClick = {
+                    navController.navigate(Screen.MainScreen.route)
+                }){
+                    Icon(imageVector = Icons.Filled.ArrowBack,
+                        contentDescription = "Menu icon",
+                        tint = MaterialTheme.colors.onBackground)
+                }
+            }
+
             IntroduceName(navController)
+        }
     }
 
     @Composable
@@ -53,7 +67,7 @@ import androidx.navigation.NavController
                     }
                     else{//To do
                         buttonPlay = "Please, introduce a name"
-                     }
+                    }
                 })
                     {
                         Text(buttonPlay)
