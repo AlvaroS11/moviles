@@ -1,5 +1,7 @@
 package com.example.datingorrelated
 
+import android.content.Context
+import android.media.MediaPlayer
 import android.os.Handler
 import android.os.Looper
 import androidx.compose.foundation.Image
@@ -17,6 +19,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -26,7 +29,7 @@ import kotlinx.coroutines.delay
 import kotlin.time.Duration.Companion.seconds
 
 // GLOBAL VARIABLES
-data class Response(var _datingBtnColor: Int, var _relatedBtnColor: Int, var _bothBtnColor: Int, var _correct: Int)
+data class Response(var _datingBtnColor: Int, var _relatedBtnColor: Int, var _bothBtnColor: Int, var _isAnswerCorrect: Boolean)
 var mQuestionsList = Constants.getQuestions()
 var shuffledQuestions = mQuestionsList.shuffled()
 var testingSeconds = 0
@@ -53,6 +56,11 @@ fun GameScreen(navController: NavController, mapName: String) {
 
     // To manage the answer timer
     var secondsToDisappear by rememberSaveable { mutableStateOf(answerTime) }
+
+    // To manage the sound effects
+    val context = LocalContext.current
+    val correct_sound = R.raw.correct_sound
+    val wrong_sound = R.raw.wrong_sound
 
     //endregion
 
@@ -83,17 +91,22 @@ fun GameScreen(navController: NavController, mapName: String) {
 
                     secondsToDisappear = answerTime // the user has answered, rewind timer
 
-                    val(_datingBtnColor, _relatedBtnColor, _bothBtnColor, _correct) = handleResponse("Dating", question, correct)
+                    val(_datingBtnColor, _relatedBtnColor, _bothBtnColor, isAnswerCorrect) = handleResponse("Dating", question)
 
                     // reassign colors based on answer
                     datingBtnColor = _datingBtnColor
                     relatedBtnColor = _relatedBtnColor
                     bothBtnColor = _bothBtnColor
-                    correct = _correct
+
+                    if (isAnswerCorrect){
+                        correct++
+                        playSoundEffect(context = context, soundEffect = correct_sound)
+                    } else{
+                        playSoundEffect(context = context, soundEffect = wrong_sound)
+                    }
 
                     Handler(Looper.getMainLooper()).postDelayed({
                         canClick = true // when the time passes, we go to the next question, so user is able to click again
-
                         // change color back to default
                         datingBtnColor = primaryColor.toArgb()
                         relatedBtnColor = primaryColor.toArgb()
@@ -121,13 +134,20 @@ fun GameScreen(navController: NavController, mapName: String) {
                     canClick = false // it has just clicked, so it can't click again
 
                     secondsToDisappear = answerTime // the user has answered, rewind timer
-                    val(_datingBtnColor, _relatedBtnColor, _bothBtnColor, _correct) = handleResponse("Related", question, correct)
+
+                    val(_datingBtnColor, _relatedBtnColor, _bothBtnColor, isAnswerCorrect) = handleResponse("Related", question)
 
                     // reassign colors based on answer
                     datingBtnColor = _datingBtnColor
                     relatedBtnColor = _relatedBtnColor
                     bothBtnColor = _bothBtnColor
-                    correct = _correct
+
+                    if (isAnswerCorrect){
+                        correct++
+                        playSoundEffect(context = context, soundEffect = correct_sound)
+                    } else{
+                        playSoundEffect(context = context, soundEffect = wrong_sound)
+                    }
 
                     Handler(Looper.getMainLooper()).postDelayed({
                         canClick = true // when the time passes, we go to the next question, so user is able to click again
@@ -160,13 +180,19 @@ fun GameScreen(navController: NavController, mapName: String) {
 
                     secondsToDisappear = answerTime // the user has answered, rewind timer
 
-                    val(_datingBtnColor, _relatedBtnColor, _bothBtnColor, _correct) = handleResponse("Both", question, correct)
+                    val(_datingBtnColor, _relatedBtnColor, _bothBtnColor, isAnswerCorrect) = handleResponse("Both", question)
 
                     // reassign colors based on answer
                     datingBtnColor = _datingBtnColor
                     relatedBtnColor = _relatedBtnColor
                     bothBtnColor = _bothBtnColor
-                    correct = _correct
+
+                    if (isAnswerCorrect){
+                        correct++
+                        playSoundEffect(context = context, soundEffect = correct_sound)
+                    } else{
+                        playSoundEffect(context = context, soundEffect = wrong_sound)
+                    }
 
                     Handler(Looper.getMainLooper()).postDelayed({
                         canClick = true // when the time passes, we go to the next question, so user is able to click again
@@ -216,11 +242,11 @@ fun GameScreen(navController: NavController, mapName: String) {
 }
 
 //region Questions related methods
-fun handleResponse(button: String, question: Question, correct: Int): Response{
+fun handleResponse(button: String, question: Question): Response{
     var _datingBtnColor = 0
     var _bothBtnColor = 0
     var _relatedBtnColor = 0
-    var _correct = correct
+    var _isAnswerCorrect = false
 
     when(button){
         "Dating" -> when(question.answer){
@@ -228,7 +254,7 @@ fun handleResponse(button: String, question: Question, correct: Int): Response{
                 _datingBtnColor = Color.Green.toArgb()
                 _bothBtnColor = Color.Gray.toArgb()
                 _relatedBtnColor = Color.Gray.toArgb()
-                _correct++
+                _isAnswerCorrect = true
             }
             "Both" -> {
                 _bothBtnColor = Color.Gray.toArgb()
@@ -252,7 +278,7 @@ fun handleResponse(button: String, question: Question, correct: Int): Response{
                 _bothBtnColor = Color.Green.toArgb()
                 _datingBtnColor = Color.Gray.toArgb()
                 _relatedBtnColor = Color.Gray.toArgb()
-                _correct++
+                _isAnswerCorrect = true
             }
             "Related" -> {
                 _bothBtnColor = Color.Red.toArgb()
@@ -275,12 +301,24 @@ fun handleResponse(button: String, question: Question, correct: Int): Response{
                 _relatedBtnColor = Color.Green.toArgb()
                 _bothBtnColor = Color.Gray.toArgb()
                 _datingBtnColor = Color.Gray.toArgb()
-                _correct++
+                _isAnswerCorrect = true
             }
         }
     }
 
-    return Response(_datingBtnColor, _relatedBtnColor, _bothBtnColor, _correct)
+    return Response(_datingBtnColor, _relatedBtnColor, _bothBtnColor, _isAnswerCorrect)
+}
+
+fun playSoundEffect(context: Context, soundEffect: Int){
+    val mp = MediaPlayer.create(context, soundEffect)
+    mp.setVolume(volume, volume)
+    mp.start()
+    mp.setOnCompletionListener {
+        MediaPlayer.OnCompletionListener {
+            mp.reset()
+            mp.release()
+        }
+    }
 }
 
 @Composable
@@ -335,7 +373,9 @@ fun QuestionImage(image: Int) {
         painter = painterResource(image),
         contentDescription = "Contact profile picture",
         modifier = Modifier
-            .size(150.dp).clip(CircleShape).border(10.dp, MaterialTheme.colors.secondary, CircleShape)
+            .size(150.dp)
+            .clip(CircleShape)
+            .border(10.dp, MaterialTheme.colors.secondary, CircleShape)
     )
 }
 
