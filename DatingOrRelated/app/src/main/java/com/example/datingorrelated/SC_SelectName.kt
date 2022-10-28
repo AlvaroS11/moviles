@@ -13,63 +13,70 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 
 @Composable
-    fun SelectName(navController: NavController) {
-        Column(){
-            Row(modifier = Modifier.background(MaterialTheme.colors.background)){
-                IconButton(onClick = {
-                    navController.navigate(Screen.MainScreen.route)
-                }){
-                    Icon(imageVector = Icons.Filled.ArrowBack,
-                        contentDescription = "Menu icon",
-                        tint = MaterialTheme.colors.onBackground)
-                }
-            }
+fun SelectName(navController: NavController) {
+    Column {
+        BackToMainScreenButton(navController)
+        IntroduceName(navController)
+    }
+}
 
-            IntroduceName(navController)
+@Composable
+fun BackToMainScreenButton(navController: NavController){
+    Row(modifier = Modifier
+        .background(MaterialTheme.colors.background)
+        .fillMaxWidth()
+        .padding(16.dp)){
+        IconButton(onClick = {
+            navController.navigate(Screen.MainScreen.route)
+        }){
+            Icon(imageVector = Icons.Filled.ArrowBack,
+                contentDescription = "Menu icon",
+                tint = MaterialTheme.colors.onBackground)
         }
     }
+}
 
-    @Composable
-    fun IntroduceName(navController: NavController) {
-        var gameName by remember { mutableStateOf("") }
+@Composable
+fun IntroduceName(navController: NavController) {
+    var gameName by remember { mutableStateOf("") }
 
-        val onProductTextChange = { text: String ->
-            gameName = text
-        }
+    val onProductTextChange = { text: String ->
+        gameName = text
+    }
 
-        Column(
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .fillMaxHeight()
+            .background(MaterialTheme.colors.background),
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally,
+    ) {
+        CustomTextField(
+            title = "Player Name",
+            textState = gameName,
+            onTextChange = onProductTextChange,
+            keyboardType = KeyboardType.Text
+        )
+
+        Row(
+            horizontalArrangement = Arrangement.SpaceEvenly,
             modifier = Modifier
                 .fillMaxWidth()
-                .fillMaxHeight()
-                .background(MaterialTheme.colors.background),
-            verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.CenterHorizontally,
+                .padding(10.dp)
         ) {
-            CustomTextField(
-                title = "Player Name",
-                textState = gameName,
-                onTextChange = onProductTextChange,
-                keyboardType = KeyboardType.Text
-            )
-
-            Row(
-                horizontalArrangement = Arrangement.SpaceEvenly,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(10.dp)
-            ) {
-                var buttonPlay = "Accept"
-                Button(onClick = {
-                    if (gameName.isNotEmpty()) {
-                            navController.navigate(Screen.GameScreen.createRoute(gameName))
-                    }
-                    else{//To do
-                        buttonPlay = "Please, introduce a name"
-                    }
-                })
-                    {
-                        Text(buttonPlay)
-                    }
-            }
+            var buttonPlay = "Accept"
+            Button(onClick = {
+                if (gameName.isNotEmpty()) {
+                        navController.navigate(Screen.GameScreen.createRoute(gameName))
+                }
+                else{//To do
+                    buttonPlay = "Please, introduce a name"
+                }
+            })
+                {
+                    Text(buttonPlay)
+                }
         }
     }
+}

@@ -27,6 +27,8 @@ var answerTime = 20
 var soundEffectsVolume = 1f
 var mainThemeVolume = 1f
 var showAnswer = false
+var firstTime = true
+lateinit var media : MediaPlayer
 
 //region ---------- OPTIONS MENU REGION ----------
 @Composable
@@ -85,16 +87,12 @@ fun TextSettings(){
 fun RadioButtonShowAnswerMode(scope: CoroutineScope, dataStore: StoreUserSettings) {
     val radioOptions = listOf("Please, I like to learn", "No, I'll get it next time")
 
-    val optionNumber: Int = if (answerTime == 20) {
+    val optionNumber: Int = if (showAnswer) {
         0
-    } else {
-        if (answerTime == 10) {
-            1
-        } else 2
-    }
+    } else 1
 
     val (selectedOption, onOptionSelected) = remember { mutableStateOf(radioOptions[optionNumber]) }
-    Column() {
+    Column {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -155,7 +153,7 @@ fun RadioButtonTimeDifficulty(scope: CoroutineScope, dataStore: StoreUserSetting
     }
 
     val (selectedOption, onOptionSelected) = remember { mutableStateOf(radioOptions[optionNumber]) }
-    Column() {
+    Column {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -219,7 +217,7 @@ fun RadioButtonHandleTheme(scope: CoroutineScope, dataStore: StoreUserSettings) 
     }
 
     val (selectedOption, onOptionSelected) = remember { mutableStateOf(radioOptions[optionNumber]) }
-    Column() {
+    Column {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -303,7 +301,7 @@ fun HandleSoundEffectsVolume(scope: CoroutineScope, dataStore: StoreUserSettings
 }
 
 @Composable
-fun HandleMainThemeVolume(scope: CoroutineScope, dataStore: StoreUserSettings) {
+fun HandleMainThemeVolume(scope: CoroutineScope, dataStore: StoreUserSettings, media: MediaPlayer) {
 
     var sliderPosition by rememberSaveable { mutableStateOf(mainThemeVolume) }
 
@@ -331,11 +329,12 @@ fun HandleMainThemeVolume(scope: CoroutineScope, dataStore: StoreUserSettings) {
             scope.launch {
                 dataStore.saveVolumeMainTheme(mainThemeVolume.toString())
             }
+            media.setVolume(sliderPosition, sliderPosition)
         })
 }
 
 @Composable
-fun Drawer(scope: CoroutineScope, dataStore: StoreUserSettings) {
+fun Drawer(scope: CoroutineScope, dataStore: StoreUserSettings, media: MediaPlayer) {
     LazyColumn(
         modifier = Modifier
             .background(MaterialTheme.colors.background)
@@ -344,7 +343,7 @@ fun Drawer(scope: CoroutineScope, dataStore: StoreUserSettings) {
         item {
             TextSettings()
             HandleSoundEffectsVolume(scope, dataStore)
-            HandleMainThemeVolume(scope, dataStore)
+            HandleMainThemeVolume(scope, dataStore, media)
             RadioButtonHandleTheme(scope, dataStore)
             RadioButtonTimeDifficulty(scope, dataStore)
             RadioButtonShowAnswerMode(scope, dataStore)
@@ -355,7 +354,6 @@ fun Drawer(scope: CoroutineScope, dataStore: StoreUserSettings) {
 
 @Composable
 fun MainScreen(navController: NavController) {
-
     // Scaffold is a layout which implements the basic material design layout structure
     // With it we can add a top bar and a drawer for the options menu
 
@@ -363,14 +361,25 @@ fun MainScreen(navController: NavController) {
     val scope = rememberCoroutineScope()
     val context = LocalContext.current
     val dataStore = StoreUserSettings(context)
+    lateinit var mp : MediaPlayer
+
+    if(firstTime){ // initialize media player if it's the first time using it and store it in global variable
+        media = MediaPlayer.create(context, R.raw.main_theme)
+        media.isLooping
+        mp = media
+        mp.setVolume(mainThemeVolume, mainThemeVolume)
+        mp.start()
+        firstTime = false
+    } else{ // else, get mediaPlayer from global variable
+        mp = media
+    }
 
     Scaffold(
         scaffoldState = scaffoldState,
         topBar = { TopBar(scope, scaffoldState) },
         content = { MainScreenContent(navController = navController) },
-        drawerContent = { Drawer(scope, dataStore) }
+        drawerContent = { Drawer(scope, dataStore, mp) }
     )
-
 }
 
 //region --------- MAIN MENU CONTENT (buttons, etc..) ------------
@@ -385,7 +394,6 @@ fun MainScreenContent(navController: NavController) {
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Text(text= mainThemeVolume.toString()+ soundEffectsVolume.toString())
         Button(
             onClick = {
                 navController.navigate(Screen.IntroName.route)
