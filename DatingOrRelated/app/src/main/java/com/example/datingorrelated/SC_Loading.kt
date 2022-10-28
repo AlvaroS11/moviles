@@ -12,6 +12,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -24,7 +25,7 @@ fun LoadingScreen(navController: NavController){
         modifier = Modifier
             .fillMaxWidth()
             .fillMaxHeight()
-            .background(MaterialTheme.colors.background),
+            .background(MaterialTheme.colors.secondary),
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
@@ -45,7 +46,7 @@ fun LoadingScreen(navController: NavController){
             Text(
             text = "DATING OR RELATED",
             fontSize = 32.sp,
-            color = MaterialTheme.colors.onPrimary,
+            color = Color.White,
             textAlign = TextAlign.Center
             )
 
@@ -53,8 +54,8 @@ fun LoadingScreen(navController: NavController){
         Text(
             text = "Press the tittle to start",
             fontSize = 24.sp,
-            color = MaterialTheme.colors.secondaryVariant,
-            modifier = Modifier.fillMaxWidth(),
+            color = Color.Black,
+            modifier = Modifier.fillMaxWidth().padding(top = 16.dp),
             textAlign = TextAlign.Center
         )
     }
