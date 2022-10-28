@@ -15,7 +15,9 @@ class StoreUserSettings (private val context: Context) {
         private val Context.dataStore: DataStore<Preferences> by preferencesDataStore("SettingsPreferences")
         val QUESTION_TIME_KEY = stringPreferencesKey("questionTime")
         val THEME_KEY = stringPreferencesKey("preferredTheme")
-        val VOLUME_KEY = stringPreferencesKey("volume")
+        val VOLUME_SOUND_EFFECTS_KEY = stringPreferencesKey("soundEffectsVolume")
+        val VOLUME_MAIN_THEME_KEY = stringPreferencesKey("mainThemeVolume")
+        val SHOW_ANSWER_KEY = stringPreferencesKey("showAnswer")
     }
 
 
@@ -41,14 +43,36 @@ class StoreUserSettings (private val context: Context) {
         }
     }
 
-    val getVolume: Flow<String> = context.dataStore.data
+    val getVolumeSoundEffects: Flow<String> = context.dataStore.data
         .map{ preferences ->
-            preferences[VOLUME_KEY] ?: ""
+            preferences[VOLUME_SOUND_EFFECTS_KEY] ?: ""
         }
 
-    suspend fun saveVolume(volume: String){
+    suspend fun saveVolumeSoundEffects(soundEffectsVolume: String){
         context.dataStore.edit { preferences ->
-            preferences[VOLUME_KEY] = volume
+            preferences[VOLUME_SOUND_EFFECTS_KEY] = soundEffectsVolume
+        }
+    }
+
+    val getVolumeMainTheme: Flow<String> = context.dataStore.data
+        .map{ preferences ->
+            preferences[VOLUME_MAIN_THEME_KEY] ?: ""
+        }
+
+    suspend fun saveVolumeMainTheme(mainThemeVolume: String){
+        context.dataStore.edit { preferences ->
+            preferences[VOLUME_MAIN_THEME_KEY] = mainThemeVolume
+        }
+    }
+
+    val getShowAnswer: Flow<String> = context.dataStore.data
+        .map{ preferences ->
+            preferences[SHOW_ANSWER_KEY] ?: ""
+        }
+
+    suspend fun saveShowAnswer(showAnswer: String){
+        context.dataStore.edit { preferences ->
+            preferences[SHOW_ANSWER_KEY] = showAnswer
         }
     }
 }

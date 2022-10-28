@@ -2,12 +2,9 @@ package com.example.datingorrelated
 
 import android.app.Activity
 import android.media.MediaPlayer
-import android.util.Log
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Settings
@@ -15,7 +12,7 @@ import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -25,48 +22,93 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
 // GLOBAL VARIABLES
-var preferredTheme = "" // by default it will be the system theme, otherwise it can be "Dark" or "Light"
+var preferredTheme = "System"
 var answerTime = 20
-var volume = 1f
+var soundEffectsVolume = 1f
+var mainThemeVolume = 1f
+var showAnswer = false
 
 //region ---------- OPTIONS MENU REGION ----------
 @Composable
-fun TopBar(scope: CoroutineScope, scaffoldState: ScaffoldState){
-    TopAppBar (
+fun TopBar(scope: CoroutineScope, scaffoldState: ScaffoldState) {
+    TopAppBar(
         modifier = Modifier.background(MaterialTheme.colors.primary),
-        title = {Text(text = "Dating or Related",
-            color = MaterialTheme.colors.onPrimary)},
+        title = {
+            Text(
+                text = "Dating or Related",
+                color = Color.White
+            )
+        },
         navigationIcon = {
             IconButton(onClick = {
                 scope.launch {
                     scaffoldState.drawerState.open()
                 }
-            }){
-                Icon(imageVector = Icons.Filled.Settings,
-                    contentDescription = "Menu icon")
+            }) {
+                Icon(
+                    imageVector = Icons.Filled.Settings,
+                    contentDescription = "Menu icon"
+                )
             }
         }
     )
 }
 
 @Composable
-fun RadioButtonTimeDifficulty(scope: CoroutineScope, dataStore: StoreUserSettings) {
-    val radioOptions = listOf("Easy: 20 seconds", "Normal: 10 seconds", "Difficult: 5 seconds")
+fun TextSettings(){
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .background(MaterialTheme.colors.primary)
+            .padding(vertical = 16.dp)
+    ) {
+        Text(
+            modifier = Modifier
+                .padding(horizontal = 16.dp)
+                .align(alignment = Alignment.CenterVertically),
+            text = "Settings",
+            fontSize = 30.sp,
+            color = MaterialTheme.colors.onBackground
+        )
+        Icon(
+            imageVector = Icons.Filled.Settings,
+            contentDescription = "Settings icon",
+            tint = MaterialTheme.colors.onBackground,
+            modifier = Modifier
+                .align(alignment = Alignment.CenterVertically)
+                .size(30.dp)
+        )
+    }
+}
 
-    val optionNumber: Int = if(answerTime == 20){
+@Composable
+fun RadioButtonShowAnswerMode(scope: CoroutineScope, dataStore: StoreUserSettings) {
+    val radioOptions = listOf("Please, I like to learn", "No, I'll get it next time")
+
+    val optionNumber: Int = if (answerTime == 20) {
         0
-    } else{
+    } else {
         if (answerTime == 10) {
             1
         } else 2
     }
 
     val (selectedOption, onOptionSelected) = remember { mutableStateOf(radioOptions[optionNumber]) }
-    Column (modifier = Modifier
-        .fillMaxWidth()
-        .padding(top = 16.dp),
-        horizontalAlignment = Alignment.CenterHorizontally){
-        Text(text = "Time difficulty (seconds per question)", modifier = Modifier.padding(bottom = 16.dp))
+    Column() {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(MaterialTheme.colors.primaryVariant.copy(alpha = 0.5f))
+                .padding(vertical = 16.dp)
+        ) {
+            Text(
+                modifier = Modifier
+                    .padding(horizontal = 16.dp)
+                    .align(alignment = Alignment.CenterVertically),
+                text = "Show answer when I fail a question",
+                color = MaterialTheme.colors.onBackground
+            )
+        }
         radioOptions.forEach { text ->
             Row(
                 modifier = Modifier
@@ -77,7 +119,68 @@ fun RadioButtonTimeDifficulty(scope: CoroutineScope, dataStore: StoreUserSetting
                     selected = (text == selectedOption),
                     onClick = {
                         onOptionSelected(text)
-                        when (text){
+                        when (text) {
+                            radioOptions[0] -> { // easy
+                                showAnswer = true
+                            }
+                            radioOptions[1] -> { // normal
+                                showAnswer = false
+                            }
+                        }
+                        // store the answer time on device
+                        scope.launch {
+                            dataStore.saveShowAnswer(showAnswer.toString())
+                        }
+                    }
+                )
+                Text( // radio button text
+                    text = text,
+                    modifier = Modifier.align(alignment = Alignment.CenterVertically)
+                )
+            }
+        }
+    }
+}
+
+@Composable
+fun RadioButtonTimeDifficulty(scope: CoroutineScope, dataStore: StoreUserSettings) {
+    val radioOptions = listOf("Easy: 20 seconds", "Normal: 10 seconds", "Difficult: 5 seconds")
+
+    val optionNumber: Int = if (answerTime == 20) {
+        0
+    } else {
+        if (answerTime == 10) {
+            1
+        } else 2
+    }
+
+    val (selectedOption, onOptionSelected) = remember { mutableStateOf(radioOptions[optionNumber]) }
+    Column() {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(MaterialTheme.colors.primaryVariant.copy(alpha = 0.5f))
+                .padding(vertical = 16.dp)
+        ) {
+            Text(
+                modifier = Modifier
+                    .padding(horizontal = 16.dp)
+                    .align(alignment = Alignment.CenterVertically),
+                text = "Time difficulty (seconds per question)",
+                color = MaterialTheme.colors.onBackground
+            )
+        }
+        radioOptions.forEach { text ->
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp)
+            ) {
+                RadioButton(
+                    selected = (text == selectedOption),
+                    onClick = {
+                        onOptionSelected(text)
+                        when (text) {
                             radioOptions[0] -> { // easy
                                 answerTime = 20
                             }
@@ -89,7 +192,7 @@ fun RadioButtonTimeDifficulty(scope: CoroutineScope, dataStore: StoreUserSetting
                             }
                         }
                         // store the answer time on device
-                        scope.launch{
+                        scope.launch {
                             dataStore.saveQuestionTime(answerTime.toString())
                         }
                     }
@@ -107,20 +210,30 @@ fun RadioButtonTimeDifficulty(scope: CoroutineScope, dataStore: StoreUserSetting
 fun RadioButtonHandleTheme(scope: CoroutineScope, dataStore: StoreUserSettings) {
     val radioOptions = listOf("Dark", "Light", "Same as system")
 
-    val optionNumber: Int = if(preferredTheme == "Dark"){
+    val optionNumber: Int = if (preferredTheme == "Dark") {
         0
-    } else{
+    } else {
         if (preferredTheme == "Light") {
             1
         } else 2
     }
 
     val (selectedOption, onOptionSelected) = remember { mutableStateOf(radioOptions[optionNumber]) }
-    Column (modifier = Modifier
-        .fillMaxWidth()
-        .padding(top = 16.dp),
-        horizontalAlignment = Alignment.CenterHorizontally){
-        Text(text = "Light mode theme", modifier = Modifier.padding(bottom = 16.dp))
+    Column() {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(MaterialTheme.colors.primaryVariant.copy(alpha = 0.5f))
+                .padding(vertical = 16.dp)
+        ) {
+            Text(
+                modifier = Modifier
+                    .padding(horizontal = 16.dp)
+                    .align(alignment = Alignment.CenterVertically),
+                text = "Light theme mode",
+                color = MaterialTheme.colors.onBackground
+            )
+        }
         radioOptions.forEach { text ->
             Row(
                 modifier = Modifier
@@ -131,7 +244,7 @@ fun RadioButtonHandleTheme(scope: CoroutineScope, dataStore: StoreUserSettings) 
                     selected = (text == selectedOption),
                     onClick = {
                         onOptionSelected(text)
-                        when (text){
+                        when (text) {
                             radioOptions[0] -> { // dark
                                 preferredTheme = text
                             }
@@ -143,7 +256,7 @@ fun RadioButtonHandleTheme(scope: CoroutineScope, dataStore: StoreUserSettings) 
                             }
                         }
                         // store the answer time on device
-                        scope.launch{
+                        scope.launch {
                             dataStore.savePreferredTheme(preferredTheme)
                         }
                     }
@@ -158,41 +271,83 @@ fun RadioButtonHandleTheme(scope: CoroutineScope, dataStore: StoreUserSettings) 
 }
 
 @Composable
-fun HandleVolume(scope: CoroutineScope, dataStore: StoreUserSettings){
+fun HandleSoundEffectsVolume(scope: CoroutineScope, dataStore: StoreUserSettings) {
 
-    var sliderPosition by rememberSaveable { mutableStateOf(volume) }
+    var sliderPosition by rememberSaveable { mutableStateOf(soundEffectsVolume) }
 
-    Text(
-        modifier = Modifier.padding(horizontal = 16.dp),
-        text = "Volume: "+ (sliderPosition*100).toInt().toString()
-    )
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .background(MaterialTheme.colors.primaryVariant.copy(alpha = 0.5f))
+            .padding(vertical = 16.dp)
+    ) {
+        Text(
+            modifier = Modifier
+                .padding(horizontal = 16.dp)
+                .align(alignment = Alignment.CenterVertically),
+            text = "Sound effects volume: " + (sliderPosition * 100).toInt().toString(),
+            color = MaterialTheme.colors.onBackground
+        )
+    }
 
     Slider(value = sliderPosition,
         valueRange = 0f..1f,
         modifier = Modifier.padding(horizontal = 16.dp),
         onValueChange = {
             sliderPosition = it
-            volume = sliderPosition
-            scope.launch{
-                dataStore.saveVolume(volume.toString())
+            soundEffectsVolume = sliderPosition
+            scope.launch {
+                dataStore.saveVolumeSoundEffects(soundEffectsVolume.toString())
             }
         })
 }
 
 @Composable
-fun Drawer(scope: CoroutineScope, dataStore: StoreUserSettings){
-    LazyColumn (modifier = Modifier
-        .background(MaterialTheme.colors.background)
-        .fillMaxHeight()) {
-        item{
-            Text(modifier = Modifier.padding(horizontal = 16.dp),
-                text = "Settings",
-                fontSize = 30.sp,
-                color = MaterialTheme.colors.onBackground
-                )
-            HandleVolume(scope, dataStore)
+fun HandleMainThemeVolume(scope: CoroutineScope, dataStore: StoreUserSettings) {
+
+    var sliderPosition by rememberSaveable { mutableStateOf(mainThemeVolume) }
+
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .background(MaterialTheme.colors.primaryVariant.copy(alpha = 0.5f))
+            .padding(vertical = 16.dp)
+    ) {
+        Text(
+            modifier = Modifier
+                .padding(horizontal = 16.dp)
+                .align(alignment = Alignment.CenterVertically),
+            text = "Main theme volume: " + (sliderPosition * 100).toInt().toString(),
+            color = MaterialTheme.colors.onBackground
+        )
+    }
+
+    Slider(value = sliderPosition,
+        valueRange = 0f..1f,
+        modifier = Modifier.padding(horizontal = 16.dp),
+        onValueChange = {
+            sliderPosition = it
+            mainThemeVolume = sliderPosition
+            scope.launch {
+                dataStore.saveVolumeMainTheme(mainThemeVolume.toString())
+            }
+        })
+}
+
+@Composable
+fun Drawer(scope: CoroutineScope, dataStore: StoreUserSettings) {
+    LazyColumn(
+        modifier = Modifier
+            .background(MaterialTheme.colors.background)
+            .fillMaxHeight()
+    ) {
+        item {
+            TextSettings()
+            HandleSoundEffectsVolume(scope, dataStore)
+            HandleMainThemeVolume(scope, dataStore)
             RadioButtonHandleTheme(scope, dataStore)
             RadioButtonTimeDifficulty(scope, dataStore)
+            RadioButtonShowAnswerMode(scope, dataStore)
         }
     }
 }
@@ -211,16 +366,17 @@ fun MainScreen(navController: NavController) {
 
     Scaffold(
         scaffoldState = scaffoldState,
-        topBar = {TopBar(scope, scaffoldState)},
-        content = {MainScreenContent(navController = navController)},
-        drawerContent = {Drawer(scope, dataStore)}
+        topBar = { TopBar(scope, scaffoldState) },
+        content = { MainScreenContent(navController = navController) },
+        drawerContent = { Drawer(scope, dataStore) }
     )
 
 }
 
 //region --------- MAIN MENU CONTENT (buttons, etc..) ------------
 @Composable
-fun MainScreenContent(navController: NavController){
+fun MainScreenContent(navController: NavController) {
+
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -229,14 +385,7 @@ fun MainScreenContent(navController: NavController){
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Text(
-            text = "Dating or related?",
-            fontSize = 32.sp,
-            color = MaterialTheme.colors.onBackground,
-            modifier = Modifier.fillMaxWidth(),
-            textAlign = TextAlign.Center
-        )
-        Spacer(modifier = Modifier.size(10.dp))
+        Text(text= mainThemeVolume.toString()+ soundEffectsVolume.toString())
         Button(
             onClick = {
                 navController.navigate(Screen.IntroName.route)

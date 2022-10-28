@@ -32,8 +32,6 @@ var mQuestionsList = Constants.getQuestions()
 var shuffledQuestions = mQuestionsList.shuffled()
 var testingSeconds = 0
 
-
-
 @Composable
 fun GameScreen(navController: NavController, mapName: String) {
 
@@ -48,7 +46,8 @@ fun GameScreen(navController: NavController, mapName: String) {
     // To manage the questions
     var mCurrentPosition by rememberSaveable { mutableStateOf(0) }
     val question = shuffledQuestions[mCurrentPosition]
-    val maximum = mQuestionsList.size
+    //val maximum = mQuestionsList.size
+    val maximum = 10
     var canClick by rememberSaveable { mutableStateOf(true) }
     var correct by rememberSaveable { mutableStateOf(0) }
 
@@ -241,6 +240,83 @@ fun GameScreen(navController: NavController, mapName: String) {
 
 //region Questions related methods
 fun handleResponse(button: String, question: Question): Response{
+    if(showAnswer){
+        val(_datingBtnColor, _relatedBtnColor, _bothBtnColor, _isAnswerCorrect) = handleResponseShowAnswer(button, question)
+        return Response(_datingBtnColor, _relatedBtnColor, _bothBtnColor, _isAnswerCorrect)
+    } else{
+        val(_datingBtnColor, _relatedBtnColor, _bothBtnColor, _isAnswerCorrect) = handleResponseDoNotShowAnswer(button, question)
+        return Response(_datingBtnColor, _relatedBtnColor, _bothBtnColor, _isAnswerCorrect)
+    }
+}
+
+fun handleResponseShowAnswer(button: String, question: Question): Response{
+    var _datingBtnColor = 0
+    var _bothBtnColor = 0
+    var _relatedBtnColor = 0
+    var _isAnswerCorrect = false
+
+    when(button){
+        "Dating" -> when(question.answer){
+            "Dating" -> {
+                _datingBtnColor = Color.Green.toArgb()
+                _bothBtnColor = Color.Gray.toArgb()
+                _relatedBtnColor = Color.Gray.toArgb()
+                _isAnswerCorrect = true
+            }
+            "Both" -> {
+                _bothBtnColor = Color.Yellow.toArgb()
+                _relatedBtnColor = Color.Gray.toArgb()
+                _datingBtnColor = Color.Red.toArgb()
+            }
+            "Related" -> {
+                _relatedBtnColor = Color.Yellow.toArgb()
+                _bothBtnColor = Color.Gray.toArgb()
+                _datingBtnColor = Color.Red.toArgb()
+
+            }
+        }
+        "Both" -> when(question.answer){
+            "Dating" -> {
+                _bothBtnColor = Color.Red.toArgb()
+                _datingBtnColor = Color.Yellow.toArgb()
+                _relatedBtnColor = Color.Gray.toArgb()
+            }
+            "Both" -> {
+                _bothBtnColor = Color.Green.toArgb()
+                _datingBtnColor = Color.Gray.toArgb()
+                _relatedBtnColor = Color.Gray.toArgb()
+                _isAnswerCorrect = true
+            }
+            "Related" -> {
+                _bothBtnColor = Color.Red.toArgb()
+                _relatedBtnColor = Color.Yellow.toArgb()
+                _datingBtnColor = Color.Gray.toArgb()
+            }
+        }
+        "Related" -> when(question.answer){
+            "Dating" -> {
+                _datingBtnColor = Color.Yellow.toArgb()
+                _bothBtnColor = Color.Gray.toArgb()
+                _relatedBtnColor = Color.Red.toArgb()
+            }
+            "Both" -> {
+                _bothBtnColor = Color.Yellow.toArgb()
+                _datingBtnColor = Color.Gray.toArgb()
+                _relatedBtnColor = Color.Red.toArgb()
+            }
+            "Related" -> {
+                _relatedBtnColor = Color.Green.toArgb()
+                _bothBtnColor = Color.Gray.toArgb()
+                _datingBtnColor = Color.Gray.toArgb()
+                _isAnswerCorrect = true
+            }
+        }
+    }
+
+    return Response(_datingBtnColor, _relatedBtnColor, _bothBtnColor, _isAnswerCorrect)
+}
+
+fun handleResponseDoNotShowAnswer(button: String, question: Question): Response{
     var _datingBtnColor = 0
     var _bothBtnColor = 0
     var _relatedBtnColor = 0
@@ -309,7 +385,7 @@ fun handleResponse(button: String, question: Question): Response{
 
 fun playSoundEffect(context: Context, soundEffect: Int){
     val mp = MediaPlayer.create(context, soundEffect)
-    mp.setVolume(volume, volume)
+    mp.setVolume(soundEffectsVolume, soundEffectsVolume)
     mp.start()
     mp.setOnCompletionListener {
         MediaPlayer.OnCompletionListener {
@@ -389,12 +465,21 @@ fun Timer() {
         mutableStateOf(0)
     }
 
-    Text(
-        text = "0 $minutes : $seconds",
-        fontSize = 40.sp,
-        color = MaterialTheme.colors.onBackground,
-        textAlign = TextAlign.Center
-    )
+    if(seconds < 10){
+        Text(
+            text = "0$minutes : 0$seconds",
+            fontSize = 40.sp,
+            color = MaterialTheme.colors.onBackground,
+            textAlign = TextAlign.Center
+        )
+    } else{
+        Text(
+            text = "0 $minutes : $seconds",
+            fontSize = 40.sp,
+            color = MaterialTheme.colors.onBackground,
+            textAlign = TextAlign.Center
+        )
+    }
 
     LaunchedEffect(key1 = seconds, key2 = minutes){
         delay(1000)

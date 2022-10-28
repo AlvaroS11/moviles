@@ -22,9 +22,18 @@ class MainActivity : ComponentActivity() {
                 answerTime = answerTimeString.value.toInt()
             }
             // get volume from device storage
-            val volumeString = dataStore.getVolume.collectAsState(initial = "")
+            val volumeSfxString = dataStore.getVolumeSoundEffects.collectAsState(initial = "")
+            if(volumeSfxString.value != ""){
+                soundEffectsVolume = volumeSfxString.value.toFloat()
+            }
+            val volumeString = dataStore.getVolumeMainTheme.collectAsState(initial = "")
             if(volumeString.value != ""){
-                volume = volumeString.value.toFloat()
+                mainThemeVolume = volumeString.value.toFloat()
+            }
+            // get if show answer from device storage
+            val showAnswerString = dataStore.getShowAnswer.collectAsState(initial = "")
+            if(showAnswerString.value != ""){
+                showAnswer = showAnswerString.value.toBoolean()
             }
 
 
