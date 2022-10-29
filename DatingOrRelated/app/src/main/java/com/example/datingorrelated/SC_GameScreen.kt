@@ -215,9 +215,21 @@ fun GameScreen(navController: NavController, mapName: String) {
 
         TimerText(secondsToDisappear) // timer of questions
         Spacer(modifier = Modifier.size(10.dp))
+
+        Row{
+            Text("Your time:",
+                fontSize = 32.sp,
+                color = MaterialTheme.colors.onBackground,
+                textAlign = TextAlign.Center,
+            )
+        }
         Row{
             Timer() // game timer
         }
+
+
+
+
     }
 
     // To manage the answer time
